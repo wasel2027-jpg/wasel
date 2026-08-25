@@ -1250,6 +1250,17 @@ async function setupProfileActions(){
   const messageBtn = document.getElementById('messageBtn');
   actionsWrap.style.display = 'flex';
 
+  // الحساب الرسمي الموثّق: يظهر زر المتابعة بس (من غير طلب صداقة)
+  // باقي الحسابات: يظهر زر طلب الصداقة بس (من غير متابعة)
+  const isOfficial = !!(viewedUserData && viewedUserData.official);
+  if(isOfficial){
+    friendBtn.style.display = 'none';
+    followBtn.style.display = '';
+  }else{
+    followBtn.style.display = 'none';
+    friendBtn.style.display = '';
+  }
+
   messageBtn.addEventListener('click', () => {
     window.location.href = 'chat.html?uid=' + viewedUid;
   });
