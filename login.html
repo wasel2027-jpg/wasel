@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — تسجيل الدخول</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .login-shell{width:100%;max-width:400px;}
+  .login-head{text-align:center;margin-bottom:34px;}
+  .login-head .brand{justify-content:center;font-size:30px;margin-bottom:8px;}
+  .login-head p{color:var(--muted);font-size:14px;margin:0;}
+  .login-card{padding:30px 26px;}
+  .divider{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px;margin:22px 0;}
+  .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+  .login-footer{text-align:center;margin-top:24px;font-size:14px;color:var(--ink-soft);}
+  .bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden;background:
+    radial-gradient(600px 400px at 15% 10%, var(--primary-tint), transparent 60%),
+    radial-gradient(500px 350px at 90% 90%, var(--accent-tint), transparent 60%),
+    var(--bg);}
+  .pass-toggle{position:relative;}
+
+  .options-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);font-weight:600;cursor:pointer;user-select:none;}
+  .checkbox-row input[type=checkbox]{
+    appearance:none;-webkit-appearance:none;width:18px;height:18px;border-radius:5px;
+    border:1.7px solid var(--border);background:var(--surface-2);position:relative;cursor:pointer;flex:0 0 auto;
+    transition:background .15s,border-color .15s;
+  }
+  .checkbox-row input[type=checkbox]:checked{background:var(--primary);border-color:var(--primary);}
+  .checkbox-row input[type=checkbox]:checked::after{
+    content:'';position:absolute;right:5px;top:1px;width:5px;height:9px;
+    border:solid #fff;border-width:0 2px 2px 0;transform:rotate(35deg);
+  }
+</style>
+</head>
+<body>
+<div class="bg-deco"></div>
+<div class="center-screen">
+  <div class="login-shell">
+    <div class="login-head">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.9"/>
+            <circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.85"/>
+          </svg>
+        </span>
+        واصل
+      </div>
+      <p>ابقَ على تواصل مع اللي يهمّوك</p>
+    </div>
+
+    <form class="card login-card" id="loginForm" novalidate>
+      <div class="field" id="idField">
+        <label>البريد الإلكتروني أو رقم الهاتف</label>
+        <input class="field-input" id="identifier" type="text" placeholder="example@email.com أو 01xxxxxxxxx" autocomplete="username">
+        <div class="field-error">من فضلك دخّل بريد إلكتروني أو رقم هاتف صحيح</div>
+      </div>
+
+      <div class="field pass-toggle" id="passField">
+        <label>كلمة السر</label>
+        <input class="field-input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+        <div class="field-error">كلمة السر لازم تكون 6 حروف على الأقل</div>
+      </div>
+
+      <div class="options-row">
+        <label class="checkbox-row">
+          <input type="checkbox" id="showPassChk">
+          إظهار كلمة السر
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="rememberChk">
+          حفظ البيانات
+        </label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+        <span id="loginBtnText">تسجيل الدخول</span>
+      </button>
+
+      <div class="divider">أو</div>
+
+      <a href="signup.html" class="btn btn-ghost btn-block">إنشاء حساب جديد</a>
+    </form>
+
+    <p class="login-footer">بالمتابعة، إنت موافق على شروط الاستخدام وسياسة الخصوصية الخاصة بواصل</p>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script>
+  const form = document.getElementById('loginForm');
+  const idInput = document.getElementById('identifier');
+  const passInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBtnText = document.getElementById('loginBtnText');
+
+  /* ---------- راية إظهار/إخفاء كلمة السر ---------- */
+  document.getElementById('showPassChk').addEventListener('change', (e) => {
+    passInput.type = e.target.checked ? 'text' : 'password';
+  });
+
+  /* ---------- تذكرني: نجيب آخر بريد/هاتف اتحفظ ونعبّي بيه الخانة ---------- */
+  const rememberChk = document.getElementById('rememberChk');
+  const rememberedIdentifier = WaselSession.getRememberedIdentifier();
+  if(rememberedIdentifier){
+    idInput.value = rememberedIdentifier;
+    rememberChk.checked = true;
+  }
+
+  // لو المستخدم داخل بالفعل يوديه على الرئيسية (إلا لو إحنا في نص عملية تسجيل الدخول
+  // نفسها، عشان الريدايركت التلقائي مايسبقش فحص "الحساب موقوف" وتحديث بيانات الجلسة)
+  let isLoggingIn = false;
+  auth.onAuthStateChanged((user) => {
+    if(user && !isLoggingIn) window.location.href = 'home.html';
+  });
+
+  function setFieldError(fieldId, hasError){
+    document.getElementById(fieldId).classList.toggle('has-error', hasError);
+  }
+
+  function isEmail(str){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str); }
+  function isEgyptPhone(str){ return /^01[0125][0-9]{8}$/.test(str); }
+
+  // بما إن Firebase Auth بيشتغل بالبريد، لو المستخدم دخّل رقم هاتف
+  // بنحوّله لصيغة بريد داخلية متسقة مع طريقة تسجيله وقت الإنشاء
+  function identifierToEmail(value){
+    if(isEmail(value)) return value;
+    if(isEgyptPhone(value)) return `${value}@wasel.app`;
+    return null;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const idVal = idInput.value.trim();
+    const passVal = passInput.value;
+
+    const email = identifierToEmail(idVal);
+    setFieldError('idField', !email);
+    setFieldError('passField', passVal.length < 6);
+    if(!email || passVal.length < 6) return;
+
+    loginBtn.disabled = true;
+    loginBtnText.innerHTML = '<span class="spinner"></span>';
+
+    isLoggingIn = true;
+    try{
+      // تذكرني: لو مفعّلة، الجلسة بتفضل شغالة حتى بعد قفل المتصفح، وبنحفظ البريد/الهاتف بس (مش كلمة السر)
+      await auth.setPersistence(
+        rememberChk.checked ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION
+      );
+      if(rememberChk.checked){
+        WaselSession.setRememberedIdentifier(idVal);
+      }else{
+        WaselSession.clearRememberedIdentifier();
+      }
+
+      const cred = await auth.signInWithEmailAndPassword(email, passVal);
+      const snap = await db.ref('users/' + cred.user.uid).get();
+      const data = snap.exists() ? snap.val() : null;
+      if(data && data.blocked){
+        await auth.signOut();
+        showToast('تم إيقاف هذا الحساب، تواصل مع الدعم', 'error');
+        isLoggingIn = false;
+        loginBtn.disabled = false; loginBtnText.textContent = 'تسجيل الدخول';
+        return;
+      }
+      // لو الحساب موجود في Authentication بس بياناته ناقصة في قاعدة البيانات
+      // (بسبب مشكلة قديمة أثناء التسجيل)، نعمّرها دلوقتي بدل ما نسيب البروفايل فاضي
+      if(!data){
+        try{
+          await db.ref('users/' + cred.user.uid).set({
+            firstName: (cred.user.displayName || 'مستخدم واصل').split(' ')[0],
+            lastName: null,
+            email: isEmail(idVal) ? idVal : null,
+            phone: isEgyptPhone(idVal) ? idVal : null,
+            gender: 'male',
+            birthDate: null,
+            photoBase64: null,
+            blocked: false,
+            createdAt: Date.now(),
+            lastLogin: Date.now()
+          });
+        }catch(e){ console.error('تعذر إنشاء بيانات المستخدم المفقودة:', e); }
+      }else{
+        db.ref('users/' + cred.user.uid + '/lastLogin').set(Date.now());
+      }
+      isLoggingIn = false;
+      window.location.href = 'home.html';
+    }catch(err){
+      isLoggingIn = false;
+      loginBtn.disabled = false;
+      loginBtnText.textContent = 'تسجيل الدخول';
+      const map = {
+        'auth/user-not-found': 'الحساب ده مش موجود',
+        'auth/wrong-password': 'كلمة السر غلط',
+        'auth/invalid-credential': 'البيانات غلط، جرب تاني',
+        'auth/too-many-requests': 'محاولات كتير غلط، جرب بعد شوية',
+      };
+      showToast(map[err.code] || 'حصلت مشكلة، جرب تاني', 'error');
+    }
+  });
+</script>
+</body>
+</html>

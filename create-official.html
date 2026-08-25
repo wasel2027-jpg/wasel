@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — إعداد الحساب الرسمي</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .setup-shell{width:100%;max-width:440px;}
+  .setup-card{padding:30px 26px;}
+  .setup-head{text-align:center;margin-bottom:22px;}
+  .setup-head .brand{justify-content:center;font-size:24px;margin-bottom:8px;}
+  .setup-head p{color:var(--muted);font-size:13.5px;margin:0;}
+  .warn-box{
+    background:var(--accent-tint);color:var(--accent);border-radius:12px;padding:12px 14px;
+    font-size:13px;margin-bottom:18px;font-weight:700;line-height:1.7;
+  }
+  .current-box{
+    background:var(--success-tint);color:var(--success);border-radius:12px;padding:12px 14px;
+    font-size:13px;margin-bottom:18px;font-weight:700;line-height:1.7;display:none;
+  }
+</style>
+</head>
+<body>
+<div class="center-screen">
+  <div class="setup-shell">
+    <div class="setup-head">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.9"/>
+            <circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.85"/>
+          </svg>
+        </span>
+        <span>واصل</span>
+      </div>
+      <p>أداة إعداد الحساب الرسمي الموثّق — تُفتح مرة واحدة بواسطة صاحب الموقع فقط</p>
+    </div>
+
+    <div class="card setup-card">
+      <div class="warn-box">
+        ⚠️ الصفحة دي أداة إدارية بس. أي حد يعرف الرابط ده يقدر يعمل حساب موثّق، فاحذف الملف بعد ما تخلص إعداد الحساب أو منعه من الوصول العام.
+      </div>
+
+      <div class="current-box" id="currentBox"></div>
+
+      <div id="setupForm">
+        <div class="field">
+          <label>اسم الحساب المعروض</label>
+          <input class="field-input" id="ofName" value="واصل">
+        </div>
+        <div class="field">
+          <label>البريد الإلكتروني أو رقم الهاتف لتسجيل الدخول <span class="req">*</span></label>
+          <input class="field-input" id="ofIdentifier" placeholder="official@wasel.app" autocomplete="off">
+        </div>
+        <div class="field">
+          <label>كلمة السر <span class="req">*</span></label>
+          <input class="field-input" id="ofPassword" type="password" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+        </div>
+        <button class="btn btn-primary btn-block" id="createOfficialBtn">
+          <span id="createOfficialBtnText">إنشاء الحساب الرسمي الموثّق</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/common.js"></script>
+<script>
+  function isEmail(str){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str); }
+  function isEgyptPhone(str){ return /^01[0125][0-9]{8}$/.test(str); }
+  function identifierToEmail(value){
+    if(isEmail(value)) return { email: value, phone: null };
+    if(isEgyptPhone(value)) return { email: `${value}@wasel.app`, phone: value };
+    return null;
+  }
+
+  /* نتأكد أولاً هل فيه حساب رسمي متظبط بالفعل ونعرضه */
+  (async function checkExisting(){
+    try{
+      const snap = await db.ref('config/officialUid').get();
+      if(snap.exists()){
+        const uid = snap.val();
+        const uSnap = await db.ref('users/' + uid).get();
+        const box = document.getElementById('currentBox');
+        if(uSnap.exists()){
+          const u = uSnap.val();
+          const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ');
+          box.innerHTML = `✅ فيه حساب رسمي متظبط بالفعل: <b>${fullName}</b> (UID: ${uid}).<br>لو عملت حساب جديد من الفورم، هيستبدل الحساب الحالي كحساب رسمي.`;
+        }else{
+          box.innerHTML = `⚠️ فيه UID محفوظ كحساب رسمي (${uid}) بس بياناته مش موجودة في قاعدة البيانات.`;
+        }
+        box.style.display = 'block';
+      }
+    }catch(e){ console.error(e); }
+  })();
+
+  document.getElementById('createOfficialBtn').addEventListener('click', async () => {
+    const name = document.getElementById('ofName').value.trim() || 'واصل';
+    const idVal = document.getElementById('ofIdentifier').value.trim();
+    const passVal = document.getElementById('ofPassword').value;
+    const idResult = identifierToEmail(idVal);
+
+    if(!idResult){ showToast('اكتب بريد إلكتروني أو رقم هاتف مصري صحيح', 'error'); return; }
+    if(passVal.length < 6){ showToast('كلمة السر لازم تكون 6 أحرف على الأقل', 'error'); return; }
+
+    const btn = document.getElementById('createOfficialBtn');
+    const btnText = document.getElementById('createOfficialBtnText');
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner"></span>';
+
+    try{
+      const cred = await auth.createUserWithEmailAndPassword(idResult.email, passVal);
+      await db.ref('users/' + cred.user.uid).set({
+        firstName: name,
+        lastName: null,
+        email: isEmail(idVal) ? idVal : null,
+        phone: idResult.phone,
+        gender: 'male',
+        birthDate: null,
+        photoBase64: null,
+        verified: true,
+        official: true,
+        blocked: false,
+        createdAt: Date.now(),
+        lastLogin: Date.now()
+      });
+      await db.ref('config/officialUid').set(cred.user.uid);
+      await auth.signOut();
+      showToast('تم إنشاء الحساب الرسمي بنجاح', 'success');
+      btnText.textContent = 'تم بنجاح ✓';
+      document.getElementById('setupForm').innerHTML = `
+        <div class="current-box" style="display:block;">
+          ✅ تم إنشاء الحساب الرسمي الموثّق بنجاح.<br>
+          UID: ${cred.user.uid}<br><br>
+          احذف الملف ده دلوقتي من مجلد الموقع (create-official.html) عشان محدش تاني يقدر يستخدمه.
+        </div>`;
+    }catch(err){
+      btn.disabled = false;
+      btnText.textContent = 'إنشاء الحساب الرسمي الموثّق';
+      const map = {
+        'auth/email-already-in-use': 'البريد أو الرقم ده متسجل بالفعل — سجّل دخول بيه من صفحة الدخول العادية بدل إنشاء حساب جديد',
+        'auth/weak-password': 'كلمة السر ضعيفة، جرب كلمة أقوى',
+        'auth/invalid-email': 'صيغة البريد مش صحيحة',
+      };
+      showToast(map[err.code] || 'حصلت مشكلة، جرب تاني', 'error');
+    }
+  });
+</script>
+</body>
+</html>

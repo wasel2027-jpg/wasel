@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — الملف الشخصي</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .profile-cover{
+    height:150px;background:linear-gradient(120deg, var(--primary) 0%, #8B7FF2 55%, var(--accent) 100%);
+    position:relative;
+  }
+  .profile-head{max-width:640px;margin:0 auto;padding:0 16px;position:relative;}
+  .profile-avatar-wrap{margin-top:-56px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;}
+  .profile-name{font-size:22px;font-weight:800;margin:12px 0 2px;}
+  .profile-sub{font-size:13.5px;color:var(--muted);margin-bottom:16px;}
+  .photo-edit-btn{
+    position:absolute;bottom:2px;left:2px;width:30px;height:30px;border-radius:50%;
+    background:var(--primary);color:#fff;border:2px solid #fff;display:flex;align-items:center;justify-content:center;
+  }
+  .avatar-wrap-inner{position:relative;}
+
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--border-soft);margin-bottom:16px;}
+  .tab-btn{
+    flex:1;background:none;border:none;padding:13px 4px;font-weight:700;font-size:14px;color:var(--muted);
+    border-bottom:2.5px solid transparent;
+  }
+  .tab-btn.active{color:var(--primary);border-color:var(--primary);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block;}
+
+  .settings-item{
+    display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--border-soft);
+  }
+  .settings-item:last-child{border-bottom:none;}
+  .settings-icon{width:38px;height:38px;border-radius:11px;background:var(--primary-tint);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .settings-label{flex:1;font-weight:700;font-size:14.5px;}
+  .settings-item.danger .settings-icon{background:var(--accent-tint);color:var(--accent);}
+  .settings-item.danger .settings-label{color:var(--accent);}
+
+  .mini-post{padding:14px;margin-bottom:12px;}
+  .mini-post-text{font-size:14px;line-height:1.6;margin-bottom:8px;}
+  .mini-post-time{font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+  .mini-post img{border-radius:10px;max-height:260px;object-fit:cover;width:100%;}
+  .empty-tab{text-align:center;padding:50px 20px;color:var(--muted);}
+
+  /* ------ نوافذ الإعدادات (مودال) ------ */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(26,27,58,.5);z-index:1000;
+    display:none;align-items:flex-start;justify-content:center;padding:40px 14px;overflow-y:auto;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:440px;box-shadow:var(--shadow-lg);}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft);}
+  .modal-head h3{margin:0;font-size:17px;}
+  .modal-close{background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;color:var(--ink-soft);font-size:16px;flex:0 0 auto;}
+  .modal-body{padding:18px 20px;}
+  .modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:14px 20px;border-top:1px solid var(--border-soft);}
+  .modal-footer .btn{min-width:110px;}
+
+  /* ------ مفتاح تبديل (سويتش) للإشعارات ------ */
+  .switch-row{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    padding:14px 2px;border-bottom:1px solid var(--border-soft);
+  }
+  .switch-row:last-child{border-bottom:none;}
+  .switch-label{font-weight:700;font-size:14px;}
+  .switch-hint{font-size:12px;color:var(--muted);margin-top:2px;}
+  .switch{position:relative;display:inline-block;width:44px;height:26px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch-slider{
+    position:absolute;cursor:pointer;inset:0;background:var(--border);
+    border-radius:99px;transition:.2s;
+  }
+  .switch-slider::before{
+    content:"";position:absolute;width:20px;height:20px;right:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s;box-shadow:var(--shadow-sm);
+  }
+  .switch input:checked + .switch-slider{background:var(--success);}
+  .switch input:checked + .switch-slider::before{transform:translateX(-18px);}
+</style>
+</head>
+<body class="auth-pending">
+<div class="auth-gate"><div class="spinner dark"></div></div>
+
+<!-- ===================== الهيدر ===================== -->
+<header class="app-header">
+  <div class="app-header-inner">
+    <a href="home.html" class="brand">
+      <span class="brand-mark">
+        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.9"/>
+          <circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.85"/>
+        </svg>
+      </span>
+    </a>
+    <a href="search.html" class="header-search">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>ابحث في واصل...</span>
+    </a>
+    <div class="header-actions">
+      <a href="home.html" class="icon-btn" title="الرئيسية">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 11l8-7 8 7M6 10v10h12V10" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </a>
+      <a href="messages.html" class="icon-btn" title="الرسائل">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 6l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <span class="badge" id="msgBadge" style="display:none;">0</span>
+      </a>
+      <a href="friend-requests.html" class="icon-btn" title="طلبات الصداقة">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.3" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 19c1.2-3.6 3.7-5.3 6.5-5.3s5.3 1.7 6.5 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 4.5a3.3 3.3 0 0 1 0 6.4M19.5 19c-.7-2.1-1.9-3.6-3.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 8h5M16.5 5.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span class="badge" id="friendReqBadge" style="display:none;">0</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<div class="profile-cover"></div>
+<div class="profile-head">
+  <div class="profile-avatar-wrap">
+    <div class="avatar-wrap-inner">
+      <div class="avatar avatar-xl" id="profileAvatar"></div>
+      <label class="photo-edit-btn" id="editPhotoBtn" style="display:none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 15v5Z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        <input type="file" id="editPhotoInput" accept="image/*" style="display:none;">
+      </label>
+    </div>
+  </div>
+  <div class="profile-name" id="profileName"></div>
+  <div class="profile-sub" id="profileSub"></div>
+  <div class="profile-counts" id="profileCounts" style="display:none;">
+    <span id="followersCountWrap"><b id="followersCount">0</b> متابع</span>
+    <span id="friendsCountWrap"><b id="friendsCount">0</b> صديق</span>
+  </div>
+
+  <!-- أزرار العلاقة (تظهر بس لو بتتصفح بروفايل شخص تاني) -->
+  <div class="profile-actions" id="profileActions" style="display:none;">
+    <button class="btn btn-primary" id="friendBtn">إضافة صديق</button>
+    <button class="btn btn-ghost" id="followBtn">متابعة</button>
+    <button class="btn btn-icon-circle" id="messageBtn" title="إرسال رسالة">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M3 6l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="tabs" id="profileTabs">
+    <button class="tab-btn active" data-tab="posts">المنشورات</button>
+    <button class="tab-btn" data-tab="friends" id="friendsTabBtn">الأصدقاء</button>
+    <button class="tab-btn" data-tab="saved" id="savedTabBtn">المحفوظات</button>
+    <button class="tab-btn" data-tab="settings" id="settingsTabBtn">الإعدادات</button>
+  </div>
+</div>
+
+<main class="page-container" style="padding-top:0;">
+  <div class="tab-panel active" id="tab-posts">
+    <div id="userPosts">
+      <div class="card mini-post skeleton" style="height:100px;"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-friends">
+    <div id="userFriends">
+      <div class="card mini-post skeleton" style="height:60px;"></div>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-saved">
+    <div id="savedPosts"></div>
+  </div>
+
+  <div class="tab-panel" id="tab-settings">
+    <div class="card">
+      <div class="settings-item" id="editInfoItem">
+        <div class="settings-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.7"/><path d="M4 20c1.5-3.8 5-5 8-5s6.5 1.2 8 5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        </div>
+        <div class="settings-label">تعديل البيانات الشخصية</div>
+      </div>
+      <div class="settings-item" id="privacyItem">
+        <div class="settings-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.7"/></svg>
+        </div>
+        <div class="settings-label">الخصوصية والأمان</div>
+      </div>
+      <div class="settings-item" id="notifItem">
+        <div class="settings-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3a5 5 0 0 0-5 5v3.2c0 .5-.2 1-.5 1.4L5 15h14l-1.5-2.4a2 2 0 0 1-.5-1.4V8a5 5 0 0 0-5-5Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="settings-label">إعدادات الإشعارات</div>
+      </div>
+      <div class="settings-item danger" id="logoutItem">
+        <div class="settings-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4M16 17l5-5-5-5M21 12H9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="settings-label">تسجيل الخروج</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== مودال: تعديل البيانات الشخصية ===================== -->
+<div class="modal-overlay" id="editInfoModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>تعديل البيانات الشخصية</h3>
+      <button class="modal-close" id="closeEditInfo">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" id="ei_first">
+        <label>الاسم الأول <span class="req">*</span></label>
+        <input class="field-input" id="ei_firstName" placeholder="مثال: خالد">
+        <div class="field-error">الاسم الأول مطلوب</div>
+      </div>
+      <div class="field" id="ei_last">
+        <label>الاسم الأخير</label>
+        <input class="field-input" id="ei_lastName" placeholder="اختياري">
+      </div>
+      <div class="field" id="ei_dob">
+        <label>تاريخ الميلاد</label>
+        <input class="field-input" id="ei_birthDate" type="date">
+      </div>
+      <div class="field" id="ei_gender">
+        <label>النوع</label>
+        <div class="select-group">
+          <div class="select-chip" data-gender="male">ذكر</div>
+          <div class="select-chip" data-gender="female">أنثى</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelEditInfo">إلغاء</button>
+      <button class="btn btn-primary" id="saveEditInfo">حفظ التغييرات</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== مودال: الخصوصية والأمان ===================== -->
+<div class="modal-overlay" id="privacyModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>الخصوصية والأمان</h3>
+      <button class="modal-close" id="closePrivacy">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field" id="pw_current">
+        <label>كلمة السر الحالية <span class="req">*</span></label>
+        <input class="field-input" id="currentPassword" type="password" placeholder="••••••">
+        <div class="field-error">دخّل كلمة السر الحالية</div>
+      </div>
+      <div class="field" id="pw_new">
+        <label>كلمة السر الجديدة <span class="req">*</span></label>
+        <input class="field-input" id="newPassword" type="password" placeholder="6 حروف على الأقل">
+        <div class="field-error">كلمة السر لازم تكون 6 حروف على الأقل</div>
+      </div>
+      <div class="field" id="pw_confirm">
+        <label>تأكيد كلمة السر الجديدة <span class="req">*</span></label>
+        <input class="field-input" id="confirmPassword" type="password" placeholder="اعد كتابة كلمة السر الجديدة">
+        <div class="field-error">كلمتا السر مش متطابقتين</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cancelPrivacy">إلغاء</button>
+      <button class="btn btn-primary" id="savePrivacy">تحديث كلمة السر</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== مودال: إعدادات الإشعارات ===================== -->
+<div class="modal-overlay" id="notifModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>إعدادات الإشعارات</h3>
+      <button class="modal-close" id="closeNotif">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="switch-row">
+        <div>
+          <div class="switch-label">الإعجابات والتعليقات</div>
+          <div class="switch-hint">إشعار لما حد يتفاعل مع منشوراتك</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif_likes">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+      <div class="switch-row">
+        <div>
+          <div class="switch-label">طلبات الصداقة والمتابعة</div>
+          <div class="switch-hint">إشعار لما حد يبعتلك طلب أو يتابعك</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif_friends">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+      <div class="switch-row">
+        <div>
+          <div class="switch-label">الرسائل</div>
+          <div class="switch-hint">إشعار لما توصلك رسالة جديدة</div>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="notif_messages">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="saveNotif">حفظ الإعدادات</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script src="js/social.js"></script>
+<script src="js/profile.js"></script>
+</body>
+</html>

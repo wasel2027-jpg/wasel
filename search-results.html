@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — نتائج البحث</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .search-header{
+    position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--border-soft);
+    padding:12px 16px;display:flex;align-items:center;gap:10px;
+  }
+  .back-btn{background:var(--bg);border:none;width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .search-box{
+    flex:1;display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:var(--radius-pill);
+    padding:11px 16px;border:1.5px solid transparent;
+  }
+  .search-box:focus-within{border-color:var(--primary);background:#fff;}
+  .search-box input{border:none;background:none;outline:none;flex:1;font-size:15px;color:var(--ink);}
+  .search-box svg{color:var(--muted);flex:0 0 auto;}
+
+  .result-item{
+    display:flex;align-items:center;gap:14px;padding:14px 8px;border-radius:12px;
+  }
+  .result-item:hover{background:var(--surface-2);}
+  .result-name{font-weight:800;font-size:15px;}
+  .result-meta{font-size:12.5px;color:var(--muted);}
+  .results-count{font-size:12.5px;color:var(--muted);padding:14px 6px 4px;}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+  .empty-state svg{margin-bottom:14px;opacity:.5;}
+</style>
+</head>
+<body class="auth-pending">
+<div class="auth-gate"><div class="spinner dark"></div></div>
+
+<div class="search-header">
+  <a href="search.html" class="back-btn">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <form class="search-box" id="searchForm">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <input type="text" id="searchInput" placeholder="ابحث عن أشخاص..." autocomplete="off">
+  </form>
+</div>
+
+<main class="page-container" style="padding-top:0;">
+  <div class="results-count" id="resultsCount"></div>
+  <div id="resultsList">
+    <div class="skeleton" style="height:60px;margin:8px 0;border-radius:12px;"></div>
+    <div class="skeleton" style="height:60px;margin:8px 0;border-radius:12px;"></div>
+  </div>
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <p>مفيش نتائج مطابقة</p>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script src="js/search-results.js"></script>
+</body>
+</html>

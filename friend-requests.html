@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — طلبات الصداقة</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .freq-header{
+    position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);padding:12px 16px;display:flex;align-items:center;gap:12px;
+  }
+  .back-btn{background:var(--bg);border:none;width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .freq-header h2{margin:0;font-size:17px;}
+  .freq-tabs .tab-btn{flex:1;background:none;border:none;padding:13px 4px;font-weight:700;font-size:14px;color:var(--muted);border-bottom:2.5px solid transparent;}
+  .freq-tabs .tab-btn.active{color:var(--primary);border-color:var(--primary);}
+  .freq-panel{display:none;}
+  .freq-panel.active{display:block;}
+</style>
+</head>
+<body class="auth-pending">
+<div class="auth-gate"><div class="spinner dark"></div></div>
+
+<div class="freq-header">
+  <a href="home.html" class="back-btn">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <h2>طلبات الصداقة</h2>
+</div>
+
+<main class="page-container" style="padding-top:14px;">
+  <div class="freq-tabs" id="freqTabs">
+    <button class="tab-btn active" data-tab="received">واردة (<span id="receivedCount">0</span>)</button>
+    <button class="tab-btn" data-tab="sent">مرسلة</button>
+  </div>
+
+  <div class="freq-panel active" id="tab-received">
+    <div id="receivedList">
+      <div class="skeleton" style="height:66px;margin-bottom:10px;border-radius:12px;"></div>
+    </div>
+    <div class="empty-freq" id="emptyReceived" style="display:none;">لسه مفيش طلبات صداقة واردة</div>
+  </div>
+
+  <div class="freq-panel" id="tab-sent">
+    <div id="sentList"></div>
+    <div class="empty-freq" id="emptySent" style="display:none;">لسه مفيش طلبات صداقة مرسلة</div>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script src="js/social.js"></script>
+<script src="js/friends.js"></script>
+</body>
+</html>

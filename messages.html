@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — الرسائل</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .msgs-header{
+    position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border-soft);padding:12px 16px;display:flex;align-items:center;gap:12px;
+  }
+  .back-btn{background:var(--bg);border:none;width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+  .msgs-header h2{margin:0;font-size:17px;}
+</style>
+</head>
+<body class="auth-pending">
+<div class="auth-gate"><div class="spinner dark"></div></div>
+
+<div class="msgs-header">
+  <a href="home.html" class="back-btn">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <h2>الرسائل</h2>
+</div>
+
+<main class="page-container" style="padding-top:10px;">
+  <div id="chatsList">
+    <div class="skeleton" style="height:64px;margin-bottom:10px;border-radius:12px;"></div>
+    <div class="skeleton" style="height:64px;margin-bottom:10px;border-radius:12px;"></div>
+  </div>
+  <div class="empty-chats" id="emptyChats" style="display:none;">
+    <svg width="54" height="54" viewBox="0 0 24 24" fill="none"><path d="M3 6l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    <p>لسه مفيش رسائل — ابحث عن صديق وابدأ محادثة</p>
+    <a href="search.html" class="btn btn-primary" style="margin-top:10px;display:inline-flex;">ابحث عن أشخاص</a>
+  </div>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script src="js/social.js"></script>
+<script src="js/messages.js"></script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>واصل — إنشاء حساب</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .signup-shell{width:100%;max-width:440px;}
+  .signup-head{text-align:center;margin-bottom:24px;}
+  .signup-head .brand{justify-content:center;font-size:26px;margin-bottom:6px;}
+  .signup-card{padding:30px 26px;}
+  .bg-deco{position:fixed;inset:0;z-index:-1;overflow:hidden;background:
+    radial-gradient(600px 400px at 85% 10%, var(--primary-tint), transparent 60%),
+    radial-gradient(500px 350px at 10% 90%, var(--accent-tint), transparent 60%),
+    var(--bg);}
+
+  /* مؤشر الخطوات */
+  .steps{display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:28px;}
+  .step-dot{width:34px;height:6px;border-radius:99px;background:var(--border);transition:background .2s;}
+  .step-dot.active{background:var(--primary);}
+  .step-dot.done{background:var(--success);}
+
+  .step-panel{display:none;}
+  .step-panel.active{display:block;}
+
+  .nav-row{display:flex;gap:10px;margin-top:6px;}
+  .nav-row .btn{flex:1;}
+
+  .row2{display:flex;gap:12px;}
+  .row2 .field{flex:1;}
+
+  /* رفع صورة البروفايل */
+  .photo-upload{display:flex;flex-direction:column;align-items:center;gap:16px;padding:10px 0 22px;}
+  .photo-circle{
+    width:140px;height:140px;border-radius:50%;background:var(--primary-tint);
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    border:3px dashed var(--border);position:relative;cursor:pointer;
+  }
+  .photo-circle img{width:100%;height:100%;object-fit:cover;}
+  .photo-circle .placeholder-icon{color:var(--primary);}
+  .photo-hint{font-size:13px;color:var(--muted);text-align:center;}
+  input[type=file]{display:none;}
+
+  .step-title{font-weight:800;font-size:19px;margin:0 0 4px;}
+  .step-sub{font-size:13px;color:var(--muted);margin:0 0 22px;}
+</style>
+</head>
+<body>
+<div class="bg-deco"></div>
+<div class="center-screen">
+  <div class="signup-shell">
+    <div class="signup-head">
+      <div class="brand">
+        <span class="brand-mark">
+          <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.9"/>
+            <circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.85"/>
+          </svg>
+        </span>
+        واصل
+      </div>
+    </div>
+
+    <div class="card signup-card">
+      <div class="steps">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+
+      <!-- الخطوة 1: البيانات الأساسية -->
+      <div class="step-panel active" id="panel1">
+        <p class="step-title">بيانات حسابك</p>
+        <p class="step-sub">هنستخدمها لتعريف باقي المستخدمين بيك</p>
+
+        <div class="row2">
+          <div class="field" id="f_first">
+            <label>الاسم الأول <span class="req">*</span></label>
+            <input class="field-input" id="firstName" placeholder="مثال: خالد">
+            <div class="field-error">الاسم الأول مطلوب</div>
+          </div>
+          <div class="field" id="f_last">
+            <label>الاسم الثاني</label>
+            <input class="field-input" id="lastName" placeholder="اختياري">
+          </div>
+        </div>
+
+        <div class="field" id="f_dob">
+          <label>تاريخ الميلاد <span class="req">*</span></label>
+          <input class="field-input" id="birthDate" type="date">
+          <div class="field-error">لازم تكون سنك 18 سنة أو أكتر عشان تقدر تسجل</div>
+        </div>
+
+        <div class="field" id="f_gender">
+          <label>النوع <span class="req">*</span></label>
+          <div class="select-group">
+            <div class="select-chip" data-gender="male">ذكر</div>
+            <div class="select-chip" data-gender="female">أنثى</div>
+          </div>
+          <div class="field-error">اختار النوع من فضلك</div>
+        </div>
+
+        <div class="field" id="f_email">
+          <label>البريد الإلكتروني أو رقم الهاتف <span class="req">*</span></label>
+          <input class="field-input" id="identifier" placeholder="example@email.com أو 01xxxxxxxxx">
+          <div class="field-error">دخّل بريد إلكتروني أو رقم هاتف صحيح</div>
+        </div>
+
+        <div class="field" id="f_pass">
+          <label>كلمة السر <span class="req">*</span></label>
+          <input class="field-input" id="password" type="password" placeholder="6 حروف على الأقل">
+          <div class="field-error">كلمة السر لازم تكون 6 حروف على الأقل</div>
+        </div>
+
+        <button class="btn btn-primary btn-block" id="toStep2">التالي</button>
+        <p style="text-align:center;font-size:14px;margin-top:18px;color:var(--ink-soft);">
+          عندك حساب؟ <a href="login.html" class="btn-text">تسجيل الدخول</a>
+        </p>
+      </div>
+
+      <!-- الخطوة 2: صورة البروفايل -->
+      <div class="step-panel" id="panel2">
+        <p class="step-title">صورة البروفايل</p>
+        <p class="step-sub">اختياري، تقدر تضيفها دلوقتي أو تتخطى الخطوة</p>
+
+        <div class="photo-upload">
+          <label class="photo-circle" id="photoCircle">
+            <svg class="placeholder-icon" width="46" height="46" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M4 20c1.5-3.8 5-5 8-5s6.5 1.2 8 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <img id="photoPreview" style="display:none;">
+            <input type="file" id="photoInput" accept="image/*">
+          </label>
+          <p class="photo-hint" id="photoHint">اضغط على الدائرة لاختيار صورة</p>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="backTo1">رجوع</button>
+          <button class="btn btn-primary" id="toStep3">التالي</button>
+        </div>
+      </div>
+
+      <!-- الخطوة 3: تأكيد -->
+      <div class="step-panel" id="panel3">
+        <p class="step-title">تأكيد إنشاء الحساب</p>
+        <p class="step-sub">راجع بياناتك قبل ما تكمل</p>
+
+        <div class="card" style="padding:18px;box-shadow:none;background:var(--surface-2);margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+            <div class="avatar avatar-lg" id="confirmAvatar"></div>
+            <div>
+              <div style="font-weight:800;font-size:17px;" id="confirmName"></div>
+              <div style="font-size:13px;color:var(--muted);" id="confirmMeta"></div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--ink-soft);" id="confirmIdentifier"></div>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn btn-ghost" id="backTo2">رجوع</button>
+          <button class="btn btn-primary" id="createBtn">
+            <span id="createBtnText">تأكيد الإنشاء</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/session.js"></script>
+<script src="js/common.js"></script>
+<script>
+  const state = { photoBase64: null };
+
+  const panels = { 1: document.getElementById('panel1'), 2: document.getElementById('panel2'), 3: document.getElementById('panel3') };
+  const dots = { 1: document.getElementById('dot1'), 2: document.getElementById('dot2'), 3: document.getElementById('dot3') };
+
+  function goToStep(n){
+    [1,2,3].forEach(i => {
+      panels[i].classList.toggle('active', i === n);
+      dots[i].classList.toggle('active', i === n);
+      dots[i].classList.toggle('done', i < n);
+    });
+    if(n === 3) fillConfirmStep();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  /* ---------- اختيار النوع ---------- */
+  let selectedGender = null;
+  document.querySelectorAll('.select-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.select-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      selectedGender = chip.dataset.gender;
+      setFieldError('f_gender', false);
+    });
+  });
+
+  function setFieldError(fieldId, hasError){
+    document.getElementById(fieldId).classList.toggle('has-error', hasError);
+  }
+  function isEmail(str){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str); }
+  function isEgyptPhone(str){ return /^01[0125][0-9]{8}$/.test(str); }
+  function identifierToEmail(value){
+    if(isEmail(value)) return { email: value, phone: null };
+    if(isEgyptPhone(value)) return { email: `${value}@wasel.app`, phone: value };
+    return null;
+  }
+
+  /* ---------- التحقق من الخطوة 1 والانتقال ---------- */
+  document.getElementById('toStep2').addEventListener('click', () => {
+    const firstName = document.getElementById('firstName').value.trim();
+    const birthDate = document.getElementById('birthDate').value;
+    const idVal = document.getElementById('identifier').value.trim();
+    const passVal = document.getElementById('password').value;
+    const idResult = identifierToEmail(idVal);
+
+    let ok = true;
+    if(!firstName){ setFieldError('f_first', true); ok = false; } else setFieldError('f_first', false);
+
+    if(!birthDate || calcAge(birthDate) < 18){ setFieldError('f_dob', true); ok = false; } else setFieldError('f_dob', false);
+
+    if(!selectedGender){ setFieldError('f_gender', true); ok = false; } else setFieldError('f_gender', false);
+
+    if(!idResult){ setFieldError('f_email', true); ok = false; } else setFieldError('f_email', false);
+
+    if(passVal.length < 6){ setFieldError('f_pass', true); ok = false; } else setFieldError('f_pass', false);
+
+    if(!ok) return;
+    goToStep(2);
+  });
+
+  /* ---------- رفع صورة البروفايل ---------- */
+  const photoInput = document.getElementById('photoInput');
+  const photoPreview = document.getElementById('photoPreview');
+  const photoHint = document.getElementById('photoHint');
+
+  photoInput.addEventListener('change', async () => {
+    const file = photoInput.files[0];
+    if(!file) return;
+    try{
+      photoHint.textContent = 'جاري تجهيز الصورة...';
+      const base64 = await compressImage(file, 500, 0.75);
+      state.photoBase64 = base64;
+      photoPreview.src = base64;
+      photoPreview.style.display = 'block';
+      document.querySelector('.placeholder-icon').style.display = 'none';
+      photoHint.textContent = 'تمام! تقدر تغيّرها لو حابب';
+    }catch(err){
+      showToast('تعذر تحميل الصورة، جرب صورة تانية', 'error');
+      photoHint.textContent = 'اضغط على الدائرة لاختيار صورة';
+    }
+  });
+
+  document.getElementById('backTo1').addEventListener('click', () => goToStep(1));
+  document.getElementById('toStep3').addEventListener('click', () => goToStep(3));
+  document.getElementById('backTo2').addEventListener('click', () => goToStep(2));
+
+  function fillConfirmStep(){
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const fullName = [firstName, lastName].filter(Boolean).join(' ');
+    const idVal = document.getElementById('identifier').value.trim();
+
+    document.getElementById('confirmName').textContent = fullName;
+    document.getElementById('confirmMeta').textContent = selectedGender === 'male' ? 'ذكر' : 'أنثى';
+    document.getElementById('confirmIdentifier').textContent = idVal;
+
+    const avatarEl = document.getElementById('confirmAvatar');
+    if(state.photoBase64){
+      avatarEl.style.backgroundImage = `url(${state.photoBase64})`;
+      avatarEl.style.backgroundSize = 'cover';
+      avatarEl.style.backgroundPosition = 'center';
+      avatarEl.textContent = '';
+    }else{
+      avatarEl.textContent = initialsOf(firstName);
+    }
+  }
+
+  /* ---------- إنشاء الحساب فعليًا ---------- */
+  let isCreatingAccount = false; // يمنع الريدايركت التلقائي من onAuthStateChanged قبل ما نخلص كتابة بيانات المستخدم
+  document.getElementById('createBtn').addEventListener('click', async () => {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const birthDate = document.getElementById('birthDate').value;
+    const idVal = document.getElementById('identifier').value.trim();
+    const passVal = document.getElementById('password').value;
+    const idResult = identifierToEmail(idVal);
+
+    const createBtn = document.getElementById('createBtn');
+    const createBtnText = document.getElementById('createBtnText');
+    createBtn.disabled = true;
+    createBtnText.innerHTML = '<span class="spinner"></span>';
+
+    isCreatingAccount = true;
+    let createdCred = null;
+    try{
+      const cred = await auth.createUserWithEmailAndPassword(idResult.email, passVal);
+      createdCred = cred;
+      await db.ref('users/' + cred.user.uid).set({
+        firstName, lastName: lastName || null,
+        email: isEmail(idVal) ? idVal : null,
+        phone: idResult.phone,
+        gender: selectedGender,
+        birthDate,
+        photoBase64: state.photoBase64 || null,
+        blocked: false,
+        createdAt: Date.now(),
+        lastLogin: Date.now()
+      });
+      isCreatingAccount = false;
+      window.location.href = 'home.html';
+    }catch(err){
+      isCreatingAccount = false;
+      createBtn.disabled = false;
+      createBtnText.textContent = 'تأكيد الإنشاء';
+      // لو الحساب اتعمل في Authentication بس فشلت كتابة بياناته في قاعدة البيانات
+      // (مثلاً بسبب صلاحيات القاعدة)، نحاول نكتبها تاني بدل ما نسيب حساب ناقص البيانات
+      if(createdCred){
+        try{
+          await db.ref('users/' + createdCred.user.uid).set({
+            firstName, lastName: lastName || null,
+            email: isEmail(idVal) ? idVal : null,
+            phone: idResult.phone,
+            gender: selectedGender,
+            birthDate,
+            photoBase64: state.photoBase64 || null,
+            blocked: false,
+            createdAt: Date.now(),
+            lastLogin: Date.now()
+          });
+          window.location.href = 'home.html';
+          return;
+        }catch(err2){
+          console.error('فشلت إعادة محاولة كتابة بيانات المستخدم:', err2);
+        }
+      }
+      const map = {
+        'auth/email-already-in-use': 'البريد أو الرقم ده متسجل بالفعل',
+        'auth/weak-password': 'كلمة السر ضعيفة، جرب كلمة أقوى',
+        'auth/invalid-email': 'صيغة البريد مش صحيحة',
+      };
+      showToast(map[err.code] || 'حصلت مشكلة أثناء حفظ بيانات الحساب، جرب تاني', 'error');
+      if(!createdCred) goToStep(1);
+    }
+  });
+
+  auth.onAuthStateChanged((user) => {
+    if(user && !isCreatingAccount) window.location.href = 'home.html';
+  });
+</script>
+</body>
+</html>
