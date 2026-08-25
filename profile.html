@@ -44,7 +44,7 @@
   --radius-pill: 999px;
 }
 
-*{box-sizing:border-box;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
 body{
   direction:rtl;
@@ -317,10 +317,27 @@ body.auth-pending > *:not(.auth-gate){
   .settings-item.danger .settings-icon{background:var(--accent-tint);color:var(--accent);}
   .settings-item.danger .settings-label{color:var(--accent);}
 
-  .mini-post{padding:14px;margin-bottom:12px;}
-  .mini-post-text{font-size:14px;line-height:1.6;margin-bottom:8px;}
-  .mini-post-time{font-size:11.5px;color:var(--muted);margin-bottom:8px;}
-  .mini-post img{border-radius:10px;max-height:260px;object-fit:cover;width:100%;}
+  /* ------ بطاقة المنشور (نفس تصميم الرئيسية) ------ */
+  .post{padding:16px;margin-bottom:16px;}
+  .post-head{display:flex;align-items:center;gap:12px;}
+  .post-author{flex:1;}
+  .post-author-name{font-weight:800;font-size:14.5px;}
+  .post-time{font-size:12px;color:var(--muted);}
+  .post-menu-btn{background:none;border:none;color:var(--muted);font-size:20px;padding:6px 10px;}
+  .post-text{margin:12px 0;font-size:15px;line-height:1.7;white-space:pre-wrap;}
+  .post-image{border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px;max-height:460px;}
+  .post-image img{width:100%;object-fit:cover;}
+  .post-stats{display:flex;justify-content:space-between;padding:8px 2px;font-size:12.5px;color:var(--muted);}
+  .post-actions{display:flex;border-top:1px solid var(--border-soft);padding-top:6px;margin-top:4px;}
+  .post-action{
+    flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+    background:none;border:none;padding:10px 4px;border-radius:8px;color:var(--ink-soft);
+    font-weight:700;font-size:13px;transition:background .15s,color .15s;
+  }
+  .post-action:hover{background:var(--bg);}
+  .post-action.liked{color:var(--accent);}
+  .post-action.saved{color:var(--success);}
+  .post-action svg{width:19px;height:19px;}
   .empty-tab{text-align:center;padding:50px 20px;color:var(--muted);}
 
   /* ------ نوافذ الإعدادات (مودال) ------ */
@@ -1516,19 +1533,67 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
-/* ---------------- منشورات المستخدم ---------------- */
-function miniPostCard(p){
+/* ---------------- منشورات المستخدم (نفس بطاقة المنشور في الرئيسية) ---------------- */
+function renderPost(p, savedMap){
+  const liked = p.likes && p.likes[profileCurrentUser.uid];
+  const saved = !!savedMap[p.id];
+  const avatarStyle = p.authorPhoto
+    ? `style="background-image:url(${p.authorPhoto});background-size:cover;background-position:center;"`
+    : '';
+  const initials = p.authorPhoto ? '' : initialsOf(p.authorName);
+
+  const profileLink = p.uid === profileCurrentUser.uid ? 'profile.html' : `profile.html?uid=${p.uid}`;
+
   return `
-    <div class="card mini-post">
-      <div class="mini-post-time">${timeAgo(p.createdAt)}</div>
-      ${p.text ? `<div class="mini-post-text">${escapeHTML(p.text)}</div>` : ''}
-      ${p.imageBase64 ? `<img src="${p.imageBase64}" loading="lazy">` : ''}
-    </div>`;
+  <article class="card post" data-post-id="${p.id}">
+    <div class="post-head">
+      <a href="${profileLink}" class="avatar avatar-md" ${avatarStyle}>${initials}</a>
+      <div class="post-author">
+        <a href="${profileLink}" class="post-author-name">${nameWithBadge(p.authorName || 'مستخدم', p.authorVerified)}</a>
+        <div class="post-time">${timeAgo(p.createdAt)}</div>
+      </div>
+      <button class="post-menu-btn">⋯</button>
+    </div>
+
+    ${p.text ? `<div class="post-text">${escapeHTML(p.text)}</div>` : ''}
+    ${p.imageBase64 ? `<div class="post-image"><img src="${p.imageBase64}" loading="lazy"></div>` : ''}
+
+    <div class="post-stats">
+      <span>${p.likesCount ? `${p.likesCount} إعجاب` : ''}</span>
+      <span>${p.commentsCount ? `${p.commentsCount} تعليق` : ''} ${p.shares ? `· ${p.shares} مشاركة` : ''}</span>
+    </div>
+
+    <div class="post-actions">
+      <button class="post-action like-btn ${liked ? 'liked' : ''}" data-id="${p.id}">
+        <svg viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}"><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2.3 4.5 6 4.5c2 0 3.4 1 6 3.6 2.6-2.6 4-3.6 6-3.6 3.7 0 5.5 3.5 4 7.2C19.5 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        إعجاب
+      </button>
+      <button class="post-action comment-btn" data-id="${p.id}">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H8l-4 4V4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        تعليق
+      </button>
+      <button class="post-action share-btn" data-id="${p.id}">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        مشاركة
+      </button>
+      <button class="post-action save-btn ${saved ? 'saved' : ''}" data-id="${p.id}">
+        <svg viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        حفظ
+      </button>
+    </div>
+
+    <div class="comments-box" id="comments-${p.id}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-soft);"></div>
+  </article>`;
+}
+
+async function getSavedMap(){
+  const savesSnap = await db.ref('saves/' + profileCurrentUser.uid).get();
+  return savesSnap.exists() ? savesSnap.val() : {};
 }
 
 function loadUserPosts(){
   const container = document.getElementById('userPosts');
-  db.ref('posts').orderByChild('uid').equalTo(viewedUid).on('value', (snap) => {
+  db.ref('posts').orderByChild('uid').equalTo(viewedUid).on('value', async (snap) => {
     if(!snap.exists()){
       container.innerHTML = `<div class="empty-tab">لسه مفيش منشورات</div>`;
       return;
@@ -1536,7 +1601,9 @@ function loadUserPosts(){
     const list = [];
     snap.forEach(c => list.push({ id: c.key, ...c.val() }));
     list.sort((a,b) => b.createdAt - a.createdAt);
-    container.innerHTML = list.map(miniPostCard).join('');
+    const savedMap = await getSavedMap();
+    container.innerHTML = list.map(p => renderPost(p, savedMap)).join('');
+    attachPostListeners(container);
   });
 }
 
@@ -1548,7 +1615,8 @@ async function loadSavedPosts(){
       container.innerHTML = `<div class="empty-tab">لسه مفيش منشورات محفوظة</div>`;
       return;
     }
-    const ids = Object.keys(snap.val());
+    const savedMap = snap.val();
+    const ids = Object.keys(savedMap);
     const posts = [];
     for(const id of ids){
       const pSnap = await db.ref('posts/' + id).get();
@@ -1556,15 +1624,122 @@ async function loadSavedPosts(){
     }
     posts.sort((a,b) => b.createdAt - a.createdAt);
     container.innerHTML = posts.length
-      ? posts.map(miniPostCard).join('')
+      ? posts.map(p => renderPost(p, savedMap)).join('')
       : `<div class="empty-tab">لسه مفيش منشورات محفوظة</div>`;
+    attachPostListeners(container);
   });
 }
 
-function escapeHTML(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
+/* ---------------- ربط أزرار كل منشور ---------------- */
+function attachPostListeners(container){
+  container.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleLike(btn.dataset.id, btn));
+  });
+  container.querySelectorAll('.save-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
+  });
+  container.querySelectorAll('.share-btn').forEach(btn => {
+    btn.addEventListener('click', () => sharePost(btn.dataset.id, btn));
+  });
+  container.querySelectorAll('.comment-btn').forEach(btn => {
+    btn.addEventListener('click', () => toggleComments(btn.dataset.id));
+  });
+}
+
+async function toggleLike(postId, btn){
+  const ref = db.ref(`posts/${postId}/likes/${profileCurrentUser.uid}`);
+  const countRef = db.ref(`posts/${postId}/likesCount`);
+  const snap = await ref.get();
+  if(snap.exists()){
+    await ref.remove();
+    countRef.transaction(v => Math.max(0, (v || 1) - 1));
+  }else{
+    await ref.set(true);
+    countRef.transaction(v => (v || 0) + 1);
+    const postSnap = await db.ref(`posts/${postId}`).get();
+    const post = postSnap.val();
+    if(post && post.uid !== profileCurrentUser.uid){
+      db.ref(`notifications/${post.uid}`).push({
+        type: 'like', fromUid: profileCurrentUser.uid,
+        fromName: [profileCurrentUserData.firstName, profileCurrentUserData.lastName].filter(Boolean).join(' '),
+        postId, read: false, createdAt: Date.now()
+      });
+    }
+  }
+}
+
+async function toggleSave(postId, btn){
+  const ref = db.ref(`saves/${profileCurrentUser.uid}/${postId}`);
+  const snap = await ref.get();
+  if(snap.exists()){
+    await ref.remove();
+    btn.classList.remove('saved');
+    showToast('تم إلغاء الحفظ');
+  }else{
+    await ref.set(true);
+    btn.classList.add('saved');
+    showToast('تم الحفظ في المحفوظات', 'success');
+  }
+}
+
+async function sharePost(postId, btn){
+  db.ref(`posts/${postId}/shares`).transaction(v => (v || 0) + 1);
+  const url = `${window.location.origin}${window.location.pathname.replace('profile.html','')}post.html?id=${postId}`;
+  if(navigator.share){
+    try{ await navigator.share({ title: 'منشور من واصل', url }); }catch(e){}
+  }else{
+    navigator.clipboard.writeText(url);
+    showToast('تم نسخ رابط المنشور', 'success');
+  }
+}
+
+/* ---------------- التعليقات ---------------- */
+function toggleComments(postId){
+  const box = document.getElementById('comments-' + postId);
+  const isOpen = box.style.display !== 'none';
+  box.style.display = isOpen ? 'none' : 'block';
+  if(!isOpen) renderComments(postId, box);
+}
+
+function renderComments(postId, box){
+  box.innerHTML = `<div class="skeleton" style="height:36px;margin-bottom:8px;"></div>`;
+  db.ref('comments/' + postId).orderByChild('createdAt').on('value', (snap) => {
+    let list = [];
+    snap.forEach(c => list.push({ id: c.key, ...c.val() }));
+    const commentsHTML = list.map(c => `
+      <div style="display:flex;gap:9px;margin-bottom:10px;">
+        <div class="avatar avatar-sm" style="${c.photo ? `background-image:url(${c.photo});background-size:cover;` : ''}">${c.photo ? '' : initialsOf(c.name)}</div>
+        <div style="background:var(--bg);border-radius:14px;padding:8px 12px;flex:1;">
+          <div style="font-weight:700;font-size:12.5px;">${escapeHTML(c.name || '')}</div>
+          <div style="font-size:13.5px;">${escapeHTML(c.text || '')}</div>
+        </div>
+      </div>`).join('');
+
+    box.innerHTML = `
+      ${commentsHTML}
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input class="field-input" style="padding:9px 14px;" placeholder="اكتب تعليق..." id="input-${postId}">
+        <button class="btn btn-primary" style="padding:9px 16px;" id="send-${postId}">إرسال</button>
+      </div>`;
+
+    document.getElementById('send-' + postId).addEventListener('click', () => submitComment(postId));
+    document.getElementById('input-' + postId).addEventListener('keydown', (e) => {
+      if(e.key === 'Enter') submitComment(postId);
+    });
+  });
+}
+
+async function submitComment(postId){
+  const input = document.getElementById('input-' + postId);
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = '';
+  const fullName = [profileCurrentUserData.firstName, profileCurrentUserData.lastName].filter(Boolean).join(' ');
+  await db.ref('comments/' + postId).push({
+    uid: profileCurrentUser.uid, name: fullName, photo: profileCurrentUserData.photoBase64 || null,
+    text, createdAt: Date.now()
+  });
+  db.ref(`posts/${postId}/commentsCount`).transaction(v => (v || 0) + 1);
 }
 
 </script>
