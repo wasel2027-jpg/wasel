@@ -4,7 +4,286 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>واصل</title>
-<link rel="stylesheet" href="css/style.css">
+<style>
+/* =========================================================
+   واصل (Wasel) — نظام التصميم المشترك
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Tajawal:wght@300;400;500;700;900&display=swap');
+
+:root{
+  /* الألوان */
+  --bg: #F5F4FB;
+  --surface: #FFFFFF;
+  --surface-2: #FBFAFF;
+  --ink: #1A1B3A;
+  --ink-soft: #4A4B6A;
+  --muted: #83839E;
+  --border: #E6E4F4;
+  --border-soft: #EFEEF8;
+
+  --primary: #5B4FE8;
+  --primary-dark: #453BC4;
+  --primary-tint: #EEECFD;
+
+  --accent: #FF6B5B;      /* لايك / تنبيهات */
+  --accent-tint: #FFE9E5;
+
+  --success: #22B27D;     /* حفظ / تأكيد */
+  --success-tint: #E1F7EE;
+
+  --gold: #E8A33D;        /* شارات ثانوية */
+
+  --shadow-sm: 0 1px 2px rgba(26,27,58,.06);
+  --shadow-md: 0 8px 24px rgba(26,27,58,.10);
+  --shadow-lg: 0 20px 48px rgba(26,27,58,.16);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  direction:rtl;
+  font-family:'Tajawal', sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+h1,h2,h3,.brand{font-family:'Almarai', sans-serif;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;}
+img{max-width:100%;display:block;}
+input,textarea,select{font-family:inherit;}
+
+::selection{background:var(--primary-tint);color:var(--primary-dark);}
+
+/* ============ شعار العلامة (الإشارة البصرية المميزة) ============ */
+.brand-mark{
+  width:38px;height:38px;flex:0 0 auto;position:relative;
+}
+.brand-mark svg{width:100%;height:100%;display:block;}
+.brand{
+  display:flex;align-items:center;gap:10px;
+  font-weight:800;font-size:22px;color:var(--primary-dark);
+  letter-spacing:-.3px;
+}
+
+/* ============ أزرار ============ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 22px;border-radius:var(--radius-pill);border:none;
+  font-weight:700;font-size:15px;transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 18px rgba(91,79,232,.30);}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-primary:disabled{background:#C9C6EE;box-shadow:none;cursor:not-allowed;}
+.btn-ghost{background:transparent;color:var(--primary);border:1.5px solid var(--border);}
+.btn-ghost:hover{background:var(--primary-tint);border-color:var(--primary-tint);}
+.btn-block{width:100%;}
+.btn-text{background:none;border:none;color:var(--primary);font-weight:700;padding:6px 4px;}
+
+/* ============ حقول الإدخال ============ */
+.field{margin-bottom:18px;text-align:right;}
+.field label{
+  display:block;font-size:13px;font-weight:700;color:var(--ink-soft);
+  margin-bottom:7px;
+}
+.field .req{color:var(--accent);}
+.field-input{
+  width:100%;padding:14px 16px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface-2);
+  font-size:15px;color:var(--ink);transition:border-color .15s, background .15s;
+}
+.field-input:focus{outline:none;border-color:var(--primary);background:#fff;}
+.field-hint{font-size:12px;color:var(--muted);margin-top:6px;}
+.field-error{font-size:12px;color:var(--accent);margin-top:6px;display:none;font-weight:700;}
+.field.has-error .field-input{border-color:var(--accent);background:var(--accent-tint);}
+.field.has-error .field-error{display:block;}
+
+.select-group{display:flex;gap:10px;}
+.select-chip{
+  flex:1;padding:14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);
+  background:var(--surface-2);text-align:center;font-weight:700;color:var(--ink-soft);
+  transition:all .15s;
+}
+.select-chip.active{border-color:var(--primary);background:var(--primary-tint);color:var(--primary-dark);}
+
+/* ============ بطاقات ============ */
+.card{
+  background:var(--surface);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-sm);border:1px solid var(--border-soft);
+}
+
+/* ============ تنبيه توست ============ */
+.toast-wrap{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{
+  background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--radius-pill);
+  font-size:14px;font-weight:700;box-shadow:var(--shadow-lg);
+  animation:toastIn .25s ease;
+}
+.toast.success{background:var(--success);}
+.toast.error{background:var(--accent);}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ سكيلتون تحميل ============ */
+.skeleton{background:linear-gradient(90deg,#EEEDF8 25%,#F6F5FC 37%,#EEEDF8 63%);background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:8px;}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+/* ============ هيدر عام (داخلي/فوتر تنقل) ============ */
+.app-header{
+  position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-soft);
+}
+.app-header-inner{
+  max-width:1100px;margin:0 auto;padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.header-search{
+  flex:1;max-width:420px;display:flex;align-items:center;gap:10px;
+  background:var(--bg);border:1.5px solid transparent;border-radius:var(--radius-pill);
+  padding:10px 16px;color:var(--muted);transition:border-color .15s;
+}
+.header-search:hover,.header-search:focus-within{border-color:var(--border);}
+.header-search input{border:none;background:none;outline:none;flex:1;font-size:14px;color:var(--ink);}
+.header-actions{display:flex;align-items:center;gap:8px;}
+.icon-btn{
+  width:44px;height:44px;border-radius:50%;border:none;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;position:relative;
+  color:var(--ink-soft);transition:background .15s,color .15s;
+}
+.icon-btn:hover{background:var(--primary-tint);color:var(--primary-dark);}
+.icon-btn .badge{
+  position:absolute;top:-2px;left:-2px;background:var(--accent);color:#fff;
+  font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:999px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;
+}
+.avatar{
+  border-radius:50%;object-fit:cover;background:var(--primary-tint);
+  display:flex;align-items:center;justify-content:center;color:var(--primary-dark);font-weight:800;
+  overflow:hidden;flex:0 0 auto;
+}
+.avatar-sm{width:38px;height:38px;font-size:15px;}
+.avatar-md{width:48px;height:48px;font-size:18px;}
+.avatar-lg{width:96px;height:96px;font-size:32px;border:4px solid #fff;box-shadow:var(--shadow-md);}
+.avatar-xl{width:128px;height:128px;font-size:40px;border:5px solid #fff;box-shadow:var(--shadow-md);}
+
+/* ============ حاوية الصفحة ============ */
+.page-container{max-width:640px;margin:0 auto;padding:20px 14px 90px;}
+.center-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+
+/* ============ مؤشر تحميل ============ */
+.spinner{width:20px;height:20px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:spin .7s linear infinite;}
+.spinner.dark{border:2.5px solid var(--border);border-top-color:var(--primary);}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+::-webkit-scrollbar{width:8px;height:8px;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+
+/* ============ بوابة التحقق من تسجيل الدخول ============
+   بتمنع ظهور أي محتوى في الصفحة قبل ما نتأكد إن فيه جلسة
+   صحيحة ومش محظورة، عشان محدش يشوف الصفحة الرئيسية أو أي
+   صفحة محمية غير وهو داخل بحساب فعلاً.                     */
+body.auth-pending > *:not(.auth-gate){
+  display:none !important;
+}
+.auth-gate{
+  position:fixed;inset:0;z-index:99999;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+}
+
+@media (max-width:480px){
+  .header-search{display:none;}
+}
+
+/* ============ شارة التوثيق (الحساب الموثّق) ============ */
+.verified-badge{vertical-align:-2.5px;margin-inline-start:4px;flex:0 0 auto;}
+.name-with-badge{display:inline-flex;align-items:center;}
+
+/* ============ أزرار العلاقة في البروفايل (متابعة/صداقة/رسالة) ============ */
+.profile-actions{display:flex;gap:10px;margin:14px 0 18px;}
+.profile-actions .btn{padding:11px 18px;font-size:13.5px;flex:1;}
+.btn-icon-circle{
+  width:44px;height:44px;border-radius:50%;flex:0 0 auto !important;padding:0 !important;
+  display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink-soft);border:none;
+}
+.btn-icon-circle:hover{background:var(--primary-tint);color:var(--primary-dark);}
+.btn-friend-pending{background:var(--surface-2);color:var(--ink-soft);border:1.5px solid var(--border);}
+.btn-friend-accept{background:var(--success);color:#fff;}
+.profile-counts{display:flex;gap:18px;margin:2px 0 10px;font-size:13px;color:var(--ink-soft);}
+.profile-counts b{color:var(--ink);font-weight:800;}
+
+/* ============ اقتراح متابعة الحساب الرسمي ============ */
+.official-suggest{
+  display:flex;align-items:center;gap:12px;padding:14px 16px;margin-bottom:16px;
+}
+.official-suggest .avatar{background:var(--primary);color:#fff;}
+.official-suggest-text{flex:1;}
+.official-suggest-title{font-weight:800;font-size:14px;display:flex;align-items:center;}
+.official-suggest-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+
+/* ============ قائمة المحادثات ============ */
+.chat-item{
+  display:flex;align-items:center;gap:13px;padding:13px 8px;border-radius:12px;position:relative;
+}
+.chat-item:hover{background:var(--surface-2);}
+.chat-item-info{flex:1;min-width:0;}
+.chat-item-name{font-weight:800;font-size:14.5px;display:flex;align-items:center;}
+.chat-item-preview{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+.chat-item-preview.unread{color:var(--ink);font-weight:700;}
+.chat-item-time{font-size:11px;color:var(--muted);flex:0 0 auto;align-self:flex-start;margin-top:2px;}
+.chat-unread-dot{width:9px;height:9px;border-radius:50%;background:var(--primary);flex:0 0 auto;}
+.empty-chats{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-chats svg{margin-bottom:14px;opacity:.5;}
+
+/* ============ صفحة محادثة فردية ============ */
+.chat-topbar{
+  position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border-soft);padding:10px 14px;display:flex;align-items:center;gap:12px;
+}
+.chat-topbar-name{font-weight:800;font-size:14.5px;display:flex;align-items:center;}
+.chat-messages{max-width:640px;margin:0 auto;padding:16px 14px 100px;min-height:60vh;}
+.msg-row{display:flex;margin-bottom:10px;}
+.msg-row.mine{justify-content:flex-start;}
+.msg-row.theirs{justify-content:flex-end;}
+.msg-bubble{max-width:72%;padding:10px 15px;border-radius:18px;font-size:14.5px;line-height:1.6;word-break:break-word;}
+.msg-row.mine .msg-bubble{background:var(--primary);color:#fff;border-bottom-left-radius:5px;}
+.msg-row.theirs .msg-bubble{background:var(--surface-2);border:1px solid var(--border-soft);border-bottom-right-radius:5px;}
+.msg-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center;}
+.chat-input-bar{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-soft);
+  padding:10px 14px;display:flex;gap:10px;align-items:center;
+}
+.chat-input-bar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;width:100%;}
+.chat-input-bar input{
+  flex:1;border:1.5px solid var(--border);background:var(--surface-2);border-radius:var(--radius-pill);
+  padding:12px 18px;font-size:14.5px;outline:none;
+}
+.chat-input-bar input:focus{border-color:var(--primary);background:#fff;}
+.chat-send-btn{
+  width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+.chat-send-btn:disabled{background:#C9C6EE;}
+
+/* ============ طلبات الصداقة ============ */
+.freq-tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border-soft);}
+.freq-item{display:flex;align-items:center;gap:13px;padding:13px;margin-bottom:10px;}
+.freq-item-info{flex:1;min-width:0;}
+.freq-item-name{font-weight:800;font-size:14.5px;display:flex;align-items:center;}
+.freq-item-time{font-size:12px;color:var(--muted);margin-top:2px;}
+.freq-actions{display:flex;gap:8px;flex:0 0 auto;}
+.freq-actions .btn{padding:9px 14px;font-size:12.5px;}
+.btn-decline{background:var(--bg);color:var(--ink-soft);}
+.empty-freq{text-align:center;padding:50px 20px;color:var(--muted);}
+
+</style>
 </head>
 <body>
 <div class="center-screen"><div class="spinner dark"></div></div>
@@ -13,7 +292,70 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
-<script src="js/firebase-config.js"></script>
+<script>
+// =========================================================
+// إعدادات Firebase — واصل (Wasel)
+// حط بيانات مشروعك هنا (نفس الطريقة اللي بتستخدمها في أواب)
+// =========================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyCIz6lkm47nZ8Lr1G0Gk1gHq_6qG7ncXsg",
+  authDomain: "wessalik.firebaseapp.com",
+  databaseURL: "https://wessalik-default-rtdb.firebaseio.com",
+  projectId: "wessalik",
+  storageBucket: "wessalik.firebasestorage.app",
+  messagingSenderId: "987939774412",
+  appId: "1:987939774412:web:a0396a313b48647c464769",
+  measurementId: "G-YXP0BMH1NF"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+// Analytics بيشتغل بس لو السكريبت بتاعه متضاف في صفحة الـ HTML (firebase-analytics-compat.js)
+if(firebase.analytics){ firebase.analytics(); }
+
+// =========================================================
+// افتراضيًا: مفيش تسجيل دخول تلقائي.
+// Firebase عادةً بيخلي المستخدم فاضل داخل حتى بعد ما يقفل المتصفح
+// (Persistence.LOCAL). هنا بنغيّر الافتراضي لـ SESSION، يعني
+// الجلسة بتتقفل تلقائيًا لما يقفل التاب/المتصفح، إلا لو المستخدم
+// حدد "حفظ البيانات" في صفحة تسجيل الدخول، وقتها بتتحول لـ LOCAL
+// صراحةً من نفس الصفحة (login.html).
+// =========================================================
+auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch((err) => {
+  console.error('تعذر ضبط نوع الجلسة الافتراضي:', err);
+});
+
+// =========================================================
+// هيكلة قاعدة البيانات (Realtime Database) المقترحة:
+//
+// users/
+//   {uid}/
+//     firstName, lastName, email, phone, gender,
+//     birthDate, photoBase64 (أو photoURL),
+//     createdAt, blocked: false,
+//     followers: {uid:true}, following: {uid:true}
+//
+// posts/
+//   {postId}/
+//     uid, authorName, authorPhoto, text, imageBase64 (اختياري),
+//     createdAt, likes: {uid:true}, likesCount,
+//     commentsCount, shares
+//
+// comments/
+//   {postId}/
+//     {commentId}/ { uid, name, photo, text, createdAt }
+//
+// saves/
+//   {uid}/
+//     {postId}: true
+//
+// notifications/
+//   {uid}/
+//     {notifId}/ { type, fromUid, fromName, postId, read, createdAt }
+// =========================================================
+
+</script>
 <script>
   auth.onAuthStateChanged((user) => {
     window.location.href = user ? 'home.html' : 'login.html';
