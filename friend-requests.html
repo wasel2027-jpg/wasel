@@ -283,6 +283,13 @@ body.auth-pending > *:not(.auth-gate){
 .btn-decline{background:var(--bg);color:var(--ink-soft);}
 .empty-freq{text-align:center;padding:50px 20px;color:var(--muted);}
 
+/* ============ اقتراحات الصداقة ============ */
+.freq-item-sub{font-size:12px;color:var(--muted);margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;}
+.suggest-tag{display:inline-flex;align-items:center;gap:4px;background:var(--primary-tint);color:var(--primary-dark);font-weight:700;padding:2px 8px;border-radius:999px;font-size:11px;}
+.suggest-tag.location{background:var(--success-tint);color:var(--success);}
+.dismiss-btn{background:none;border:none;color:var(--muted);font-size:18px;line-height:1;padding:6px;flex:0 0 auto;}
+.dismiss-btn:hover{color:var(--ink-soft);}
+
 </style>
 <style>
   .freq-header{
@@ -302,7 +309,7 @@ body.auth-pending > *:not(.auth-gate){
 
 <div class="freq-header">
   <a href="home.html" class="back-btn">
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-6 7 6 7"/></g></svg>
   </a>
   <h2>طلبات الصداقة</h2>
 </div>
@@ -311,6 +318,7 @@ body.auth-pending > *:not(.auth-gate){
   <div class="freq-tabs" id="freqTabs">
     <button class="tab-btn active" data-tab="received">واردة (<span id="receivedCount">0</span>)</button>
     <button class="tab-btn" data-tab="sent">مرسلة</button>
+    <button class="tab-btn" data-tab="suggestions">اقتراحات</button>
   </div>
 
   <div class="freq-panel active" id="tab-received">
@@ -323,6 +331,14 @@ body.auth-pending > *:not(.auth-gate){
   <div class="freq-panel" id="tab-sent">
     <div id="sentList"></div>
     <div class="empty-freq" id="emptySent" style="display:none;">لسه مفيش طلبات صداقة مرسلة</div>
+  </div>
+
+  <div class="freq-panel" id="tab-suggestions">
+    <div id="suggestionsList">
+      <div class="skeleton" style="height:66px;margin-bottom:10px;border-radius:12px;"></div>
+      <div class="skeleton" style="height:66px;margin-bottom:10px;border-radius:12px;"></div>
+    </div>
+    <div class="empty-freq" id="emptySuggestions" style="display:none;">لسه مفيش اقتراحات صداقة دلوقتي</div>
   </div>
 </main>
 
@@ -654,7 +670,7 @@ function logout(){
 
 /* ---------- شارة التوثيق (تظهر جنب اسم أي حساب موثّق زي حساب واصل الرسمي) ---------- */
 function verifiedBadgeHTML(){
-  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2l2.4 1.7 2.9-.4 1.2 2.6 2.6 1.2-.4 2.9L22.4 12l-1.7 2.4.4 2.9-2.6 1.2-1.2 2.6-2.9-.4L12 22l-2.4-1.7-2.9.4-1.2-2.6-2.6-1.2.4-2.9L1.6 12l1.7-2.4-.4-2.9 2.6-1.2 1.2-2.6 2.9.4L12 2Z" fill="#5B4FE8"/><path d="M8.5 12.3l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2.2l2.1 1.4 2.5-.6 1.3 2.2 2.3 1.1-.3 2.5 1.6 2-1.6 2 .3 2.5-2.3 1.1-1.3 2.2-2.5-.6L12 21.8l-2.1-1.4-2.5.6-1.3-2.2-2.3-1.1.3-2.5-1.6-2 1.6-2-.3-2.5 2.3-1.1 1.3-2.2 2.5.6Z" fill="#5B4FE8" stroke="none"/><path d="M8.3 12.2l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
 }
 function nameWithBadge(name, isVerified){
   return `<span class="name-with-badge">${escapeHTML(name || '')}${isVerified ? verifiedBadgeHTML() : ''}</span>`;
@@ -665,6 +681,21 @@ function escapeHTML(str){
   const div = document.createElement('div');
   div.textContent = str || '';
   return div.innerHTML;
+}
+
+/* ---------- تطبيع النص العربي (مستخدمة في مقارنة المدينة لاقتراحات الصداقة) ---------- */
+function normalizeArabic(str){
+  return (str || '')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+    .replace(/\u0640/g, '')
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي');
+}
+function normalizeForSearch(str){
+  return normalizeArabic((str || '').trim().toLowerCase());
 }
 
 </script>
@@ -863,17 +894,24 @@ requireAuth((user, userData) => {
   freqUserData = userData || {};
   listenReceived();
   listenSent();
+  loadSuggestions();
 });
 
 /* ---------------- التبويبات ---------------- */
+function activateTab(tabName){
+  const btn = document.querySelector(`#freqTabs .tab-btn[data-tab="${tabName}"]`);
+  if(!btn) return;
+  document.querySelectorAll('#freqTabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.freq-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+}
 document.querySelectorAll('#freqTabs .tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('#freqTabs .tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.freq-panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
-  });
+  btn.addEventListener('click', () => activateTab(btn.dataset.tab));
 });
+// لو جاي من رابط بيحدد تاب معين (زي اقتراحات الصداقة من الصفحة الرئيسية)
+const freqInitialTab = new URLSearchParams(window.location.search).get('tab');
+if(freqInitialTab) activateTab(freqInitialTab);
 
 /* ---------------- الطلبات الواردة ---------------- */
 function listenReceived(){
@@ -984,6 +1022,154 @@ function listenSent(){
           btn.disabled = false;
         }
       });
+    });
+  });
+}
+
+/* ---------------- اقتراحات الصداقة ----------------
+   الترتيب: الأشخاص اللي عندهم أكتر أصدقاء مشتركين معايا بيطلعوا الأول
+   (من الأعلى للأقل)، وبعدين الأشخاص من نفس المدينة/المحافظة/الدولة. */
+const dismissedSuggestions = new Set();
+
+async function computeFriendSuggestions(me, meData){
+  // Firebase rules بتسمح بقراءة friends/{uid} لأي مستخدم مسجّل دخول، لكن مش بتسمح
+  // بقراءة عقدة "friends" كلها دفعة واحدة — فبنجيب أصدقاء كل واحد من أصدقائي
+  // على حدة (قراءة مسموحة)، وبنحسب من كده عدد الأصدقاء المشتركين مع كل مرشّح
+  // من غير ما نحتاج نقرا friends/{مرشّح} أصلًا.
+  const [friendsSnap, usersSnap, receivedSnap, sentSnap] = await Promise.all([
+    db.ref('friends/' + me.uid).get(),
+    db.ref('users').get(),
+    db.ref('friendRequests/' + me.uid).get(),
+    db.ref('sentFriendRequests/' + me.uid).get()
+  ]);
+
+  const myFriends = friendsSnap.exists() ? Object.keys(friendsSnap.val()) : [];
+  const myFriendsSet = new Set(myFriends);
+  const receivedSet = receivedSnap.exists() ? new Set(Object.keys(receivedSnap.val())) : new Set();
+  const sentSet = sentSnap.exists() ? new Set(Object.keys(sentSnap.val())) : new Set();
+
+  const allUsers = {};
+  if(usersSnap.exists()) usersSnap.forEach(c => { allUsers[c.key] = c.val(); });
+
+  // عدد الأصدقاء المشتركين لكل مرشّح = كام مرة ظهر في قوائم أصدقاء أصدقائي
+  const mutualCountMap = {};
+  const friendsOfFriendsSnaps = await Promise.all(myFriends.map(fid => db.ref('friends/' + fid).get()));
+  friendsOfFriendsSnaps.forEach(snap => {
+    if(!snap.exists()) return;
+    Object.keys(snap.val()).forEach(uid => {
+      if(uid === me.uid) return;
+      mutualCountMap[uid] = (mutualCountMap[uid] || 0) + 1;
+    });
+  });
+
+  // نبني مجموعة المرشحين: أصدقاء أصدقائي + أشخاص من نفس المدينة/المحافظة/الدولة
+  const candidateIds = new Set(Object.keys(mutualCountMap));
+  const haveLocation = !!(meData.city || meData.governorate || meData.country);
+  if(haveLocation){
+    Object.keys(allUsers).forEach(uid => {
+      const u = allUsers[uid];
+      const sameCity = meData.city && u.city && normalizeForSearch(u.city) === normalizeForSearch(meData.city);
+      const sameGov = meData.governorate && u.governorate && u.governorate === meData.governorate;
+      const sameCountry = meData.country && u.country && u.country === meData.country;
+      if(sameCity || sameGov || sameCountry) candidateIds.add(uid);
+    });
+  }
+
+  const results = [];
+  candidateIds.forEach(uid => {
+    if(uid === me.uid) return;
+    if(myFriendsSet.has(uid)) return;
+    if(receivedSet.has(uid) || sentSet.has(uid)) return;
+    if(dismissedSuggestions.has(uid)) return;
+    const u = allUsers[uid];
+    if(!u || u.blocked) return;
+
+    const mutualCount = mutualCountMap[uid] || 0;
+
+    let locationLabel = '';
+    if(meData.city && u.city && normalizeForSearch(u.city) === normalizeForSearch(meData.city)){
+      locationLabel = `من ${u.city}`;
+    }else if(meData.governorate && u.governorate === meData.governorate){
+      locationLabel = `من محافظة ${u.governorate}`;
+    }else if(meData.country && u.country === meData.country){
+      locationLabel = `من ${u.country}`;
+    }
+    const locationScore = meData.city && u.city && normalizeForSearch(u.city) === normalizeForSearch(meData.city) ? 3
+      : (meData.governorate && u.governorate === meData.governorate) ? 2
+      : (meData.country && u.country === meData.country) ? 1 : 0;
+
+    if(mutualCount === 0 && locationScore === 0) return;
+
+    results.push({ id: uid, data: u, mutualCount, locationScore, locationLabel });
+  });
+
+  results.sort((a, b) => b.mutualCount - a.mutualCount || b.locationScore - a.locationScore);
+  return results;
+}
+
+async function loadSuggestions(){
+  const listEl = document.getElementById('suggestionsList');
+  const emptyEl = document.getElementById('emptySuggestions');
+  try{
+    const results = (await computeFriendSuggestions(freqUser, freqUserData)).slice(0, 40);
+    renderSuggestions(listEl, emptyEl, results);
+  }catch(err){
+    console.error('خطأ في اقتراحات الصداقة:', err);
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+  }
+}
+
+function renderSuggestions(listEl, emptyEl, results){
+  if(results.length === 0){
+    listEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = results.map(r => {
+    const u = r.data;
+    const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ');
+    const avatarStyle = u.photoBase64 ? `style="background-image:url(${u.photoBase64});background-size:cover;background-position:center;"` : '';
+    const initials = u.photoBase64 ? '' : initialsOf(u.firstName);
+    const tags = [];
+    if(r.mutualCount > 0) tags.push(`<span class="suggest-tag">${r.mutualCount} صديق مشترك</span>`);
+    if(r.locationLabel) tags.push(`<span class="suggest-tag location">${escapeHTML(r.locationLabel)}</span>`);
+    return `
+      <div class="card freq-item" data-uid="${r.id}">
+        <a href="profile.html?uid=${r.id}" class="avatar avatar-md" ${avatarStyle}>${initials}</a>
+        <div class="freq-item-info">
+          <a href="profile.html?uid=${r.id}" class="freq-item-name">${nameWithBadge(fullName, u.verified)}</a>
+          <div class="freq-item-sub">${tags.join('')}</div>
+        </div>
+        <div class="freq-actions">
+          <button class="btn btn-primary add-suggest-btn" data-uid="${r.id}">إضافة</button>
+          <button class="dismiss-btn" data-uid="${r.id}" title="مش دلوقتي">✕</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.add-suggest-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      btn.disabled = true;
+      btn.textContent = 'تم الإرسال';
+      try{
+        await WaselSocial.sendFriendRequest(freqUser, freqUserData, btn.dataset.uid);
+        showToast('تم إرسال طلب الصداقة', 'success');
+      }catch(err){
+        showToast('حصلت مشكلة، جرب تاني', 'error');
+        btn.disabled = false;
+        btn.textContent = 'إضافة';
+      }
+    });
+  });
+  listEl.querySelectorAll('.dismiss-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      dismissedSuggestions.add(btn.dataset.uid);
+      const card = btn.closest('.freq-item');
+      if(card) card.remove();
+      if(!listEl.querySelector('.freq-item')) document.getElementById('emptySuggestions').style.display = 'block';
     });
   });
 }

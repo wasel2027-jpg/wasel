@@ -242,35 +242,134 @@ body.auth-pending > *:not(.auth-gate){
 .empty-chats{text-align:center;padding:60px 20px;color:var(--muted);}
 .empty-chats svg{margin-bottom:14px;opacity:.5;}
 
-/* ============ صفحة محادثة فردية ============ */
+/* ============ صفحة محادثة فردية (بأسلوب ماسنجر) ============ */
 .chat-topbar{
   position:sticky;top:0;z-index:100;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
   border-bottom:1px solid var(--border-soft);padding:10px 14px;display:flex;align-items:center;gap:12px;
+  transition:box-shadow .2s;
 }
+.chat-topbar.is-scrolled{box-shadow:var(--shadow-sm);}
 .chat-topbar-name{font-weight:800;font-size:14.5px;display:flex;align-items:center;}
-.chat-messages{max-width:640px;margin:0 auto;padding:16px 14px 100px;min-height:60vh;}
-.msg-row{display:flex;margin-bottom:10px;}
-.msg-row.mine{justify-content:flex-start;}
-.msg-row.theirs{justify-content:flex-end;}
-.msg-bubble{max-width:72%;padding:10px 15px;border-radius:18px;font-size:14.5px;line-height:1.6;word-break:break-word;}
-.msg-row.mine .msg-bubble{background:var(--primary);color:#fff;border-bottom-left-radius:5px;}
-.msg-row.theirs .msg-bubble{background:var(--surface-2);border:1px solid var(--border-soft);border-bottom-right-radius:5px;}
-.msg-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center;}
+.chat-topbar-status{font-size:11.5px;color:var(--muted);margin-top:1px;}
+.chat-topbar-info{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;}
+
+.chat-messages{
+  max-width:640px;margin:0 auto;padding:18px 14px 14px;min-height:60vh;
+  display:flex;flex-direction:column;
+}
+
+/* فاصل التاريخ (اليوم / أمس / تاريخ) */
+.chat-date-divider{
+  display:flex;align-items:center;justify-content:center;margin:18px 0 14px;
+  font-size:11.5px;font-weight:800;color:var(--muted);
+}
+.chat-date-divider span{
+  background:var(--surface-2);padding:5px 14px;border-radius:var(--radius-pill);
+  border:1px solid var(--border-soft);
+}
+
+/* مجموعة رسائل متتالية من نفس الشخص */
+.msg-group{display:flex;gap:8px;margin-bottom:14px;align-items:flex-end;}
+.msg-group.mine{justify-content:flex-start;}
+.msg-group.theirs{justify-content:flex-end;}
+.msg-group-avatar{width:26px;height:26px;flex:0 0 auto;visibility:hidden;}
+.msg-group-avatar.show{visibility:visible;}
+.msg-stack{display:flex;flex-direction:column;max-width:72%;}
+.msg-group.mine .msg-stack{align-items:flex-start;}
+.msg-group.theirs .msg-stack{align-items:flex-end;}
+
+.msg-row{display:flex;margin-top:2px;}
+.msg-row:first-child{margin-top:0;}
+.msg-bubble{
+  padding:10px 15px;border-radius:18px;font-size:14.5px;line-height:1.55;
+  word-break:break-word;white-space:pre-wrap;position:relative;
+  animation:bubbleIn .18s ease;
+}
+@keyframes bubbleIn{from{opacity:0;transform:translateY(6px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+.msg-group.mine .msg-bubble{background:var(--primary);color:#fff;}
+.msg-group.theirs .msg-bubble{background:var(--surface-2);border:1px solid var(--border-soft);color:var(--ink);}
+
+/* شكل الذيل: نضيّق الزاوية بس في آخر رسالة بالمجموعة */
+.msg-group.mine .msg-row.is-last .msg-bubble{border-bottom-left-radius:5px;}
+.msg-group.theirs .msg-row.is-last .msg-bubble{border-bottom-right-radius:5px;}
+.msg-group.mine .msg-row:not(:first-child):not(.is-last) .msg-bubble,
+.msg-group.mine .msg-row.is-last:not(:first-child) .msg-bubble{border-top-left-radius:6px;}
+.msg-group.theirs .msg-row:not(:first-child):not(.is-last) .msg-bubble,
+.msg-group.theirs .msg-row.is-last:not(:first-child) .msg-bubble{border-top-right-radius:6px;}
+
+.msg-bubble.is-sending{opacity:.65;}
+.msg-bubble.is-failed{background:var(--accent-tint);color:var(--ink);border:1px solid var(--accent);}
+
+/* حاوية الفقاعة + الوقت/حالة القراءة — بتتقلّص على حجم الفقاعة نفسها
+   عشان الوقت وعلامة القراءة تفضل ملزّقة بآخر الرسالة على جانب الشاشة،
+   مش عنصر عريض يظهر في نص الصفحة */
+.msg-body{width:fit-content;max-width:100%;}
+.msg-group.mine .msg-body{margin-inline-start:auto;}
+.msg-group.theirs .msg-body{margin-inline-end:auto;}
+.msg-meta{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:10.5px;color:var(--muted);width:fit-content;}
+.msg-group.mine .msg-meta{flex-direction:row-reverse;margin-inline-start:auto;}
+.msg-group.theirs .msg-meta{margin-inline-end:auto;}
+.msg-status-icon{display:inline-flex;align-items:center;width:14px;height:14px;flex:0 0 auto;transition:color .15s ease;}
+.msg-status-icon svg{width:100%;height:100%;}
+.msg-status-icon.sending{color:var(--muted);animation:msgPulse 1s ease infinite;}
+@keyframes msgPulse{0%,100%{opacity:.35;}50%{opacity:.9;}}
+.msg-status-icon.sent{color:var(--muted);}
+/* الرسالة اتقرأت (شوهدت) — علامة صح مزدوجة بلون مميز */
+.msg-status-icon.read{color:#34B7F1;}
+.msg-retry-btn{
+  font-size:11px;font-weight:800;color:var(--accent);background:none;border:none;padding:0;
+  cursor:pointer;text-decoration:underline;
+}
+
+.chat-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;color:var(--muted);padding:50px 24px;gap:10px;min-height:50vh;
+}
+.chat-empty-icon{
+  width:64px;height:64px;border-radius:50%;background:var(--primary-tint);color:var(--primary);
+  display:flex;align-items:center;justify-content:center;
+}
+.chat-empty-title{font-weight:800;font-size:15px;color:var(--ink);}
+.chat-empty-sub{font-size:13px;max-width:240px;}
+
+/* زرار النزول لآخر المحادثة */
+.scroll-bottom-btn{
+  position:fixed;bottom:86px;left:50%;transform:translateX(-50%) translateY(12px);
+  width:38px;height:38px;border-radius:50%;background:#fff;color:var(--primary);border:1px solid var(--border-soft);
+  box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:90;
+}
+.scroll-bottom-btn.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.scroll-bottom-btn .badge{
+  position:absolute;top:-4px;left:-4px;background:var(--accent);color:#fff;font-size:9.5px;font-weight:800;
+  min-width:16px;height:16px;border-radius:999px;display:flex;align-items:center;justify-content:center;
+  padding:0 3px;border:2px solid #fff;
+}
+
 .chat-input-bar{
   position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-soft);
-  padding:10px 14px;display:flex;gap:10px;align-items:center;
+  padding:9px 14px calc(9px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center;
 }
-.chat-input-bar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;width:100%;}
-.chat-input-bar input{
-  flex:1;border:1.5px solid var(--border);background:var(--surface-2);border-radius:var(--radius-pill);
-  padding:12px 18px;font-size:14.5px;outline:none;
+.chat-input-bar-inner{max-width:640px;margin:0 auto;display:flex;gap:9px;width:100%;align-items:flex-end;}
+.chat-input-wrap{
+  flex:1;display:flex;align-items:flex-end;border:1.5px solid var(--border);background:var(--surface-2);
+  border-radius:22px;padding:5px 6px 5px 16px;transition:border-color .15s,background .15s;
 }
-.chat-input-bar input:focus{border-color:var(--primary);background:#fff;}
+.chat-input-wrap:focus-within{border-color:var(--primary);background:#fff;}
+.chat-input-bar textarea{
+  flex:1;border:none;background:none;outline:none;resize:none;font-family:inherit;
+  font-size:14.5px;line-height:1.5;padding:7px 0;max-height:110px;color:var(--ink);
+}
+.chat-input-bar textarea::placeholder{color:var(--muted);}
 .chat-send-btn{
-  width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;
+  width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;border:none;
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+  transition:background .15s,transform .12s;
 }
-.chat-send-btn:disabled{background:#C9C6EE;}
+.chat-send-btn:hover:not(:disabled){background:var(--primary-dark);}
+.chat-send-btn:active:not(:disabled){transform:scale(.92);}
+.chat-send-btn:disabled{background:#DAD8F5;color:#fff;cursor:not-allowed;}
+.chat-send-btn svg{margin-inline-start:-1px;}
 
 /* ============ طلبات الصداقة ============ */
 .freq-tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border-soft);}
@@ -288,13 +387,16 @@ body.auth-pending > *:not(.auth-gate){
 <body class="auth-pending">
 <div class="auth-gate"><div class="spinner dark"></div></div>
 
-<div class="chat-topbar">
+<div class="chat-topbar" id="chatTopbar">
   <a href="messages.html" class="back-btn" style="background:var(--bg);border:none;width:40px;height:40px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);">
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-6 7 6 7"/></g></svg>
   </a>
   <a href="#" id="chatOtherProfileLink" style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
     <div class="avatar avatar-sm" id="chatOtherAvatar"></div>
-    <div class="chat-topbar-name" id="chatOtherName">...</div>
+    <div class="chat-topbar-info">
+      <div class="chat-topbar-name" id="chatOtherName">...</div>
+      <div class="chat-topbar-status">اضغط لعرض الملف الشخصي</div>
+    </div>
   </a>
 </div>
 
@@ -303,11 +405,18 @@ body.auth-pending > *:not(.auth-gate){
   <div class="skeleton" style="height:40px;width:50%;margin-right:auto;margin-bottom:10px;border-radius:16px;"></div>
 </main>
 
+<button class="scroll-bottom-btn" id="scrollBottomBtn" aria-label="النزول لآخر رسالة">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></g></svg>
+  <span class="badge" id="scrollBottomBadge" style="display:none;"></span>
+</button>
+
 <div class="chat-input-bar">
   <div class="chat-input-bar-inner">
-    <input type="text" id="chatInput" placeholder="اكتب رسالة..." maxlength="2000" autocomplete="off">
-    <button class="chat-send-btn" id="chatSendBtn" disabled>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="rotate(90 12 12)"/></svg>
+    <div class="chat-input-wrap">
+      <textarea id="chatInput" rows="1" placeholder="اكتب رسالة..." maxlength="2000"></textarea>
+    </div>
+    <button class="chat-send-btn" id="chatSendBtn" disabled aria-label="إرسال">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.3 11.9 20.5 3.6a.9.9 0 0 1 1.2 1.2L14 22a.9.9 0 0 1-1.65.08l-3.3-6.6-6.6-3.3a.9.9 0 0 1 .15-1.28.9.9 0 0 1 .3-.24Z"/><path d="M10.7 13.4 15.5 8.6"/></g></svg>
     </button>
   </div>
 </div>
@@ -640,7 +749,7 @@ function logout(){
 
 /* ---------- شارة التوثيق (تظهر جنب اسم أي حساب موثّق زي حساب واصل الرسمي) ---------- */
 function verifiedBadgeHTML(){
-  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2l2.4 1.7 2.9-.4 1.2 2.6 2.6 1.2-.4 2.9L22.4 12l-1.7 2.4.4 2.9-2.6 1.2-1.2 2.6-2.9-.4L12 22l-2.4-1.7-2.9.4-1.2-2.6-2.6-1.2.4-2.9L1.6 12l1.7-2.4-.4-2.9 2.6-1.2 1.2-2.6 2.9.4L12 2Z" fill="#5B4FE8"/><path d="M8.5 12.3l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2.2l2.1 1.4 2.5-.6 1.3 2.2 2.3 1.1-.3 2.5 1.6 2-1.6 2 .3 2.5-2.3 1.1-1.3 2.2-2.5-.6L12 21.8l-2.1-1.4-2.5.6-1.3-2.2-2.3-1.1.3-2.5-1.6-2 1.6-2-.3-2.5 2.3-1.1 1.3-2.2 2.5.6Z" fill="#5B4FE8" stroke="none"/><path d="M8.3 12.2l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
 }
 function nameWithBadge(name, isVerified){
   return `<span class="name-with-badge">${escapeHTML(name || '')}${isVerified ? verifiedBadgeHTML() : ''}</span>`;
@@ -770,7 +879,7 @@ const WaselSocial = (function(){
     const otherName = fullNameOf(otherData);
 
     await db.ref(`chats/${chatId}/meta/members`).update({ [me.uid]: true, [otherUid]: true });
-    await db.ref(`chats/${chatId}/messages`).push({ from: me.uid, text, createdAt: now });
+    const pushedRef = await db.ref(`chats/${chatId}/messages`).push({ from: me.uid, text, createdAt: now });
 
     await db.ref(`userChats/${me.uid}/${chatId}`).update({
       otherUid, otherName, otherPhoto: otherData.photoBase64 || null,
@@ -782,7 +891,7 @@ const WaselSocial = (function(){
       otherVerified: !!meData.verified,
       lastMessage: text, lastMessageAt: now, lastSenderUid: me.uid, unread: true
     });
-    return chatId;
+    return { chatId, messageId: pushedRef.key, createdAt: now };
   }
 
   function markChatRead(uid, chatId){
@@ -850,6 +959,9 @@ let chatId = null;
 const chatParams = new URLSearchParams(window.location.search);
 chatOtherUid = chatParams.get('uid');
 
+let chatOtherAvatarHTML = '';
+let chatOtherInitial = '؟';
+
 requireAuth(async (user, userData) => {
   if(!chatOtherUid || chatOtherUid === user.uid){
     window.location.href = 'messages.html';
@@ -869,12 +981,15 @@ requireAuth(async (user, userData) => {
   const fullName = [chatOtherData.firstName, chatOtherData.lastName].filter(Boolean).join(' ');
 
   const avatarEl = document.getElementById('chatOtherAvatar');
+  chatOtherInitial = initialsOf(chatOtherData.firstName);
   if(chatOtherData.photoBase64){
     avatarEl.style.backgroundImage = `url(${chatOtherData.photoBase64})`;
     avatarEl.style.backgroundSize = 'cover';
     avatarEl.style.backgroundPosition = 'center';
+    chatOtherAvatarHTML = `<div class="avatar msg-group-avatar show" style="background-image:url(${chatOtherData.photoBase64});background-size:cover;background-position:center;"></div>`;
   }else{
-    avatarEl.textContent = initialsOf(chatOtherData.firstName);
+    avatarEl.textContent = chatOtherInitial;
+    chatOtherAvatarHTML = `<div class="avatar msg-group-avatar show">${escapeHTML(chatOtherInitial)}</div>`;
   }
   document.getElementById('chatOtherName').innerHTML = nameWithBadge(fullName, chatOtherData.verified);
   document.getElementById('chatOtherProfileLink').href = 'profile.html?uid=' + chatOtherUid;
@@ -883,58 +998,333 @@ requireAuth(async (user, userData) => {
   listenMessages();
 });
 
-function listenMessages(){
-  const box = document.getElementById('chatMessages');
-  db.ref(`chats/${chatId}/messages`).orderByChild('createdAt').on('value', (snap) => {
-    if(!snap.exists()){
-      box.innerHTML = `<div style="text-align:center;color:var(--muted);padding:40px 20px;font-size:13.5px;">ابدأ المحادثة بأول رسالة 👋</div>`;
-      return;
+/* ---------------- عرض الرسائل (لحظي، بأسلوب ماسنجر) ---------------- */
+const chatBox = document.getElementById('chatMessages');
+const scrollBottomBtn = document.getElementById('scrollBottomBtn');
+const scrollBottomBadge = document.getElementById('scrollBottomBadge');
+const chatTopbar = document.getElementById('chatTopbar');
+
+const renderedMessageIds = new Set();
+const pendingByMessageId = new Map(); // messageId الحقيقي -> عنصر الفقاعة المؤقتة (لحد ما توصل من السيرفر)
+let lastRenderedGroupEl = null;
+let lastRenderedFrom = null;
+let lastRenderedAt = 0;
+let lastRenderedDateKey = null;
+let unseenWhileScrolledUp = 0;
+let messagesLoaded = false;
+
+function dayKey(ts){
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+function formatDateDivider(ts){
+  const today = new Date();
+  const d = new Date(ts);
+  const todayKey = dayKey(today.getTime());
+  const yestKey = dayKey(today.getTime() - 86400000);
+  const k = dayKey(ts);
+  if(k === todayKey) return 'اليوم';
+  if(k === yestKey) return 'أمس';
+  return d.toLocaleDateString('ar-EG', { day:'numeric', month:'long', year:'numeric' });
+}
+function formatClock(ts){
+  return new Date(ts).toLocaleTimeString('ar-EG', { hour:'2-digit', minute:'2-digit' });
+}
+
+function isNearBottom(){
+  return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 160);
+}
+function scrollToBottom(smooth=false){
+  window.scrollTo({ top: document.body.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+  unseenWhileScrolledUp = 0;
+  updateScrollBottomBtn();
+}
+function updateScrollBottomBtn(){
+  const show = !isNearBottom();
+  scrollBottomBtn.classList.toggle('show', show);
+  if(show && unseenWhileScrolledUp > 0){
+    scrollBottomBadge.style.display = 'flex';
+    scrollBottomBadge.textContent = unseenWhileScrolledUp > 9 ? '9+' : unseenWhileScrolledUp;
+  }else{
+    scrollBottomBadge.style.display = 'none';
+  }
+}
+window.addEventListener('scroll', updateScrollBottomBtn);
+scrollBottomBtn.addEventListener('click', () => scrollToBottom(true));
+
+function clearEmptyState(){
+  const empty = chatBox.querySelector('.chat-empty');
+  if(empty) empty.remove();
+}
+function renderEmptyState(){
+  chatBox.innerHTML = `
+    <div class="chat-empty">
+      <div class="chat-empty-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5C7.03 3.5 3 6.83 3 10.94c0 2.06 1.02 3.92 2.68 5.26-.12.98-.5 2.01-1.18 3.01a.4.4 0 0 0 .43.61c1.6-.34 2.94-.9 3.94-1.6.97.24 2.01.36 3.13.36 4.97 0 9-3.33 9-7.44S16.97 3.5 12 3.5Z"/></g></svg>
+      </div>
+      <div class="chat-empty-title">ابدأ المحادثة</div>
+      <div class="chat-empty-sub">اكتب أول رسالة لـ ${escapeHTML([chatOtherData.firstName, chatOtherData.lastName].filter(Boolean).join(' '))} وابدأ التواصل 👋</div>
+    </div>`;
+}
+
+/* بيقرر هل الرسالة دي استكمال لنفس المجموعة اللي فاتت (نفس الشخص + خلال 4 دقايق) */
+function shouldContinueGroup(from, createdAt){
+  return lastRenderedGroupEl && lastRenderedFrom === from && (createdAt - lastRenderedAt) < 4 * 60 * 1000;
+}
+
+/* ---------------- علامات حالة الرسالة: بيتبعت / اتبعت / اتقرأ ---------------- */
+const MSG_STATUS_ICONS = {
+  sending: '<svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></g></svg>',
+  sent: '<svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.3 4.3L19.2 7"/></g></svg>',
+  read: '<svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12.5l4.3 4.3L15.5 5.6"/><path d="M9.2 12.5l4.3 4.3L22 5.6"/></g></svg>',
+};
+
+// آخر وقت شاف فيه الطرف التاني المحادثة (بيتحدث لحظيًا). أي رسالة "مني" وقت
+// إرسالها أقل من أو يساوي الوقت ده، معناها إنه شافها فعلاً (اتقرأت).
+let otherSeenAt = 0;
+
+function resolveMsgStatus(m){
+  if(m.status === 'failed') return 'failed';
+  if(m.status === 'sending') return 'sending';
+  if(m.from === chatMe.uid && otherSeenAt && m.createdAt <= otherSeenAt) return 'read';
+  return 'sent';
+}
+
+function applyStatusToRow(row, status){
+  const icon = row.querySelector('.msg-status-icon');
+  if(!icon) return;
+  icon.className = 'msg-status-icon ' + status;
+  icon.innerHTML = MSG_STATUS_ICONS[status] || '';
+}
+
+/* بتتفحص كل رسايلي المرسلة وتحدّث أي رسالة بقت "مقروءة" حسب otherSeenAt */
+function updateReadStatuses(){
+  chatBox.querySelectorAll('.msg-row.mine').forEach((row) => {
+    const icon = row.querySelector('.msg-status-icon');
+    if(!icon || icon.classList.contains('sending') || icon.classList.contains('failed')) return;
+    if(icon.classList.contains('read')) return;
+    const createdAt = Number(row.dataset.createdAt || 0);
+    if(createdAt && otherSeenAt && createdAt <= otherSeenAt){
+      applyStatusToRow(row, 'read');
     }
-    const list = [];
-    snap.forEach(c => list.push({ id: c.key, ...c.val() }));
-
-    box.innerHTML = list.map(m => {
-      const mine = m.from === chatMe.uid;
-      return `
-        <div class="msg-row ${mine ? 'mine' : 'theirs'}">
-          <div>
-            <div class="msg-bubble">${escapeHTML(m.text)}</div>
-            <div class="msg-time">${timeAgo(m.createdAt)}</div>
-          </div>
-        </div>`;
-    }).join('');
-
-    box.scrollIntoView({ block: 'end' });
-    window.scrollTo(0, document.body.scrollHeight);
-
-    // لو وصلت رسالة جديدة والصفحة مفتوحة، نأكد إنها متعلمة كمقروءة
-    WaselSocial.markChatRead(chatMe.uid, chatId);
   });
 }
 
-/* ---------------- إرسال رسالة ---------------- */
+function appendMessageBubble(m, { optimistic = false } = {}){
+  clearEmptyState();
+
+  const mine = m.from === chatMe.uid;
+  const dKey = dayKey(m.createdAt);
+  if(dKey !== lastRenderedDateKey){
+    chatBox.insertAdjacentHTML('beforeend', `<div class="chat-date-divider"><span>${formatDateDivider(m.createdAt)}</span></div>`);
+    lastRenderedDateKey = dKey;
+    lastRenderedGroupEl = null; // فاصل تاريخ بيقفل أي مجموعة قبله
+  }
+
+  const continued = shouldContinueGroup(m.from, m.createdAt);
+
+  let groupEl;
+  if(continued){
+    groupEl = lastRenderedGroupEl;
+    // آخر صف في المجموعة مش هو الأخير دلوقتي
+    const prevLast = groupEl.querySelector('.msg-row.is-last');
+    if(prevLast) prevLast.classList.remove('is-last');
+  }else{
+    groupEl = document.createElement('div');
+    groupEl.className = `msg-group ${mine ? 'mine' : 'theirs'}`;
+    groupEl.innerHTML = `${!mine ? chatOtherAvatarHTML : ''}<div class="msg-stack"></div>`;
+    chatBox.appendChild(groupEl);
+  }
+
+  const stack = groupEl.querySelector('.msg-stack');
+  const row = document.createElement('div');
+  row.className = 'msg-row is-last' + (mine ? ' mine' : ' theirs');
+  row.dataset.msgId = m.id || '';
+  row.dataset.createdAt = m.createdAt || '';
+
+  const status = resolveMsgStatus(m);
+  const statusHTML = mine ? `
+    <div class="msg-meta">
+      <span>${formatClock(m.createdAt)}</span>
+      <span class="msg-status-icon ${status}">
+        ${status === 'failed' ? '' : MSG_STATUS_ICONS[status]}
+      </span>
+      ${status === 'failed' ? '<button type="button" class="msg-retry-btn">إعادة المحاولة</button>' : ''}
+    </div>` : `<div class="msg-meta"><span>${formatClock(m.createdAt)}</span></div>`;
+
+  row.innerHTML = `
+    <div class="msg-body">
+      <div class="msg-bubble ${m.status === 'sending' ? 'is-sending' : ''} ${m.status === 'failed' ? 'is-failed' : ''}">${escapeHTML(m.text)}</div>
+      ${statusHTML}
+    </div>`;
+
+  if(m.status === 'failed'){
+    row.querySelector('.msg-retry-btn').addEventListener('click', () => retrySendMessage(row, m));
+  }
+
+  stack.appendChild(row);
+
+  lastRenderedGroupEl = groupEl;
+  lastRenderedFrom = m.from;
+  lastRenderedAt = m.createdAt;
+
+  return row;
+}
+
+function listenMessages(){
+  chatBox.innerHTML = '';
+  renderedMessageIds.clear();
+  pendingByMessageId.clear();
+  lastRenderedGroupEl = null;
+  lastRenderedFrom = null;
+  lastRenderedAt = 0;
+  lastRenderedDateKey = null;
+  messagesLoaded = false;
+
+  const ref = db.ref(`chats/${chatId}/messages`).orderByChild('createdAt');
+
+  ref.once('value').then((snap) => {
+    if(!snap.exists() && !messagesLoaded){
+      renderEmptyState();
+    }
+  }).catch((err) => {
+    console.error(err);
+    showToast('تعذر تحميل الرسائل، تحقّق من اتصالك بالإنترنت', 'error');
+  });
+
+  ref.on('child_added', (snap) => {
+    const m = { id: snap.key, ...snap.val(), status: 'sent' };
+    if(renderedMessageIds.has(m.id)) return;
+    renderedMessageIds.add(m.id);
+    messagesLoaded = true;
+
+    const wasNearBottom = isNearBottom();
+
+    // لو الرسالة دي كانت عندنا كـ"جارِ الإرسال" محليًا، منعرضهاش تاني، بس نأكد حالتها "اتبعتت"
+    if(pendingByMessageId.has(m.id)){
+      const row = pendingByMessageId.get(m.id);
+      pendingByMessageId.delete(m.id);
+      const bubble = row.querySelector('.msg-bubble');
+      if(bubble) bubble.classList.remove('is-sending');
+      row.dataset.createdAt = m.createdAt || row.dataset.createdAt;
+      applyStatusToRow(row, resolveMsgStatus(m));
+      return;
+    }
+
+    appendMessageBubble(m);
+
+    if(wasNearBottom){
+      scrollToBottom();
+    }else if(m.from !== chatMe.uid){
+      unseenWhileScrolledUp++;
+    }
+    updateScrollBottomBtn();
+
+    WaselSocial.markChatRead(chatMe.uid, chatId);
+  });
+
+  ref.on('child_removed', (snap) => {
+    renderedMessageIds.delete(snap.key);
+  });
+}
+
+/* ---------------- إرسال رسالة (فوري على الشاشة + إعادة محاولة عند الفشل) ---------------- */
 const chatInput = document.getElementById('chatInput');
 const chatSendBtn = document.getElementById('chatSendBtn');
 
+function autoResizeInput(){
+  chatInput.style.height = 'auto';
+  chatInput.style.height = Math.min(chatInput.scrollHeight, 110) + 'px';
+}
 chatInput.addEventListener('input', () => {
   chatSendBtn.disabled = !chatInput.value.trim();
+  autoResizeInput();
 });
 chatInput.addEventListener('keydown', (e) => {
-  if(e.key === 'Enter' && chatInput.value.trim()) sendChatMessage();
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    if(chatInput.value.trim()) sendChatMessage();
+  }
 });
 chatSendBtn.addEventListener('click', sendChatMessage);
 
+let sendingInFlight = false;
+
 async function sendChatMessage(){
   const text = chatInput.value.trim();
-  if(!text) return;
+  if(!text || sendingInFlight) return;
+
   chatInput.value = '';
+  autoResizeInput();
   chatSendBtn.disabled = true;
+
+  await dispatchMessage(text);
+}
+
+async function dispatchMessage(text, existingRow){
+  sendingInFlight = true;
+  const localCreatedAt = Date.now();
+
+  let row = existingRow;
+  if(!row){
+    row = appendMessageBubble({ from: chatMe.uid, text, createdAt: localCreatedAt, status: 'sending' });
+    scrollToBottom();
+  }else{
+    // إعادة محاولة: رجّع الفقاعة لحالة "جارِ الإرسال"
+    row.classList.remove('is-failed');
+    const bubble = row.querySelector('.msg-bubble');
+    bubble.classList.add('is-sending');
+    bubble.classList.remove('is-failed');
+    const meta = row.querySelector('.msg-meta');
+    meta.innerHTML = `
+      <span>${formatClock(localCreatedAt)}</span>
+      <span class="msg-status-icon sending"><svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/></g></svg></span>`;
+  }
+
   try{
-    await WaselSocial.sendMessage(chatMe, chatMeData, chatOtherUid, chatOtherData, text);
+    const result = await WaselSocial.sendMessage(chatMe, chatMeData, chatOtherUid, chatOtherData, text);
+    // اربط الرسالة الحقيقية اللي جاية من السيرفر بالفقاعة المؤقتة عشان ما تتكررش
+    if(result && result.messageId){
+      if(renderedMessageIds.has(result.messageId)){
+        // وصلت فعلاً عن طريق child_added قبل ما نوصل هنا: امسح الفقاعة المؤقتة
+        row.remove();
+      }else{
+        renderedMessageIds.add(result.messageId);
+        pendingByMessageId.set(result.messageId, row);
+        row.dataset.msgId = result.messageId;
+        const bubble = row.querySelector('.msg-bubble');
+        const statusIcon = row.querySelector('.msg-status-icon');
+        if(bubble) bubble.classList.remove('is-sending');
+        if(statusIcon){
+          statusIcon.classList.remove('sending');
+          statusIcon.classList.add('sent');
+          statusIcon.innerHTML = '<svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.3 4.3L19.2 7"/></g></svg>';
+        }
+      }
+    }
   }catch(err){
     console.error(err);
-    showToast('تعذر إرسال الرسالة', 'error');
+    markMessageFailed(row, text);
+    showToast('تعذر إرسال الرسالة، تحقّق من اتصالك بالإنترنت', 'error');
+  }finally{
+    sendingInFlight = false;
   }
+}
+
+function markMessageFailed(row, text){
+  const bubble = row.querySelector('.msg-bubble');
+  bubble.classList.remove('is-sending');
+  bubble.classList.add('is-failed');
+  const meta = row.querySelector('.msg-meta');
+  meta.innerHTML = `
+    <span>${formatClock(Date.now())}</span>
+    <span class="msg-status-icon failed"></span>
+    <button type="button" class="msg-retry-btn">إعادة المحاولة</button>`;
+  meta.querySelector('.msg-retry-btn').addEventListener('click', () => retrySendMessage(row, { text }));
+}
+
+function retrySendMessage(row, m){
+  dispatchMessage(m.text, row);
 }
 
 </script>

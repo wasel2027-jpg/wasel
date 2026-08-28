@@ -316,10 +316,10 @@ body.auth-pending > *:not(.auth-gate){
 
 <div class="search-header">
   <a href="home.html" class="back-btn">
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-6 7 6 7"/></g></svg>
   </a>
   <form class="search-box" id="searchForm">
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.2-4.2"/></g></svg>
     <input type="text" id="searchInput" placeholder="ابحث عن أشخاص..." autocomplete="off">
     <button type="button" class="clear-btn" id="clearBtn">مسح</button>
   </form>
@@ -663,7 +663,7 @@ function logout(){
 
 /* ---------- شارة التوثيق (تظهر جنب اسم أي حساب موثّق زي حساب واصل الرسمي) ---------- */
 function verifiedBadgeHTML(){
-  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2l2.4 1.7 2.9-.4 1.2 2.6 2.6 1.2-.4 2.9L22.4 12l-1.7 2.4.4 2.9-2.6 1.2-1.2 2.6-2.9-.4L12 22l-2.4-1.7-2.9.4-1.2-2.6-2.6-1.2.4-2.9L1.6 12l1.7-2.4-.4-2.9 2.6-1.2 1.2-2.6 2.9.4L12 2Z" fill="#5B4FE8"/><path d="M8.5 12.3l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2.2l2.1 1.4 2.5-.6 1.3 2.2 2.3 1.1-.3 2.5 1.6 2-1.6 2 .3 2.5-2.3 1.1-1.3 2.2-2.5-.6L12 21.8l-2.1-1.4-2.5.6-1.3-2.2-2.3-1.1.3-2.5-1.6-2 1.6-2-.3-2.5 2.3-1.1 1.3-2.2 2.5.6Z" fill="#5B4FE8" stroke="none"/><path d="M8.3 12.2l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
 }
 function nameWithBadge(name, isVerified){
   return `<span class="name-with-badge">${escapeHTML(name || '')}${isVerified ? verifiedBadgeHTML() : ''}</span>`;
@@ -733,7 +733,7 @@ function loadRecentSearches(){
     container.innerHTML = list.map(item => `
       <div class="recent-item">
         <div class="recent-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.4V12.2l3.2 1.9"/></g></svg>
         </div>
         <a class="recent-text" href="search-results.html?q=${encodeURIComponent(item.query)}">${escapeHTML(item.query)}</a>
         <button class="remove-recent" data-id="${item.id}">✕</button>

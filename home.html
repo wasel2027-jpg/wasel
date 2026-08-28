@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>try{if(localStorage.getItem("waselTheme")==="dark"){document.documentElement.setAttribute("data-theme","dark");}}catch(e){}</script>
 <title>واصل — الرئيسية</title>
 <style>
 /* =========================================================
@@ -43,6 +44,28 @@
   --radius-lg: 24px;
   --radius-pill: 999px;
 }
+
+/* ============ الوضع الليلي ============ */
+:root[data-theme="dark"]{
+  --bg:#14152B; --surface:#1E1F3C; --surface-2:#252747; --ink:#F1F0FB; --ink-soft:#C7C6E8;
+  --muted:#8E8DB4; --border:#34365E; --border-soft:#2A2C50;
+  --primary-tint:#2B2A56; --accent-tint:#3A2530; --success-tint:#153A2C;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3); --shadow-md:0 8px 24px rgba(0,0,0,.35); --shadow-lg:0 20px 48px rgba(0,0,0,.45);
+}
+:root[data-theme="dark"] .app-header{background:rgba(30,31,60,.92);}
+:root[data-theme="dark"] .brand,
+:root[data-theme="dark"] .avatar,
+:root[data-theme="dark"] .icon-btn:hover,
+:root[data-theme="dark"] .select-chip.active,
+:root[data-theme="dark"] .drawer-nav-icon,
+:root[data-theme="dark"] .btn-icon-circle:hover{
+  color:#BAB2FF;
+}
+:root[data-theme="dark"] ::selection{ background:var(--primary-tint); color:#BAB2FF; }
+:root[data-theme="dark"] .btn-primary:disabled,
+:root[data-theme="dark"] .chat-send-btn:disabled{ background:#39396B; color:#8E8DB4; }
+:root[data-theme="dark"] img{ filter:brightness(.93); }
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb{ background:var(--border); }
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{margin:0;padding:0;}
@@ -101,7 +124,8 @@ input,textarea,select{font-family:inherit;}
   border:1.5px solid var(--border);background:var(--surface-2);
   font-size:15px;color:var(--ink);transition:border-color .15s, background .15s;
 }
-.field-input:focus{outline:none;border-color:var(--primary);background:#fff;}
+.field-input:focus{outline:none;border-color:var(--primary);background:var(--surface);}
+.field-input::placeholder{color:var(--muted);opacity:1;}
 .field-hint{font-size:12px;color:var(--muted);margin-top:6px;}
 .field-error{font-size:12px;color:var(--accent);margin-top:6px;display:none;font-weight:700;}
 .field.has-error .field-input{border-color:var(--accent);background:var(--accent-tint);}
@@ -162,7 +186,7 @@ input,textarea,select{font-family:inherit;}
 .icon-btn .badge{
   position:absolute;top:-2px;left:-2px;background:var(--accent);color:#fff;
   font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:999px;
-  display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--surface);
 }
 .avatar{
   border-radius:50%;object-fit:cover;background:var(--primary-tint);
@@ -171,8 +195,45 @@ input,textarea,select{font-family:inherit;}
 }
 .avatar-sm{width:38px;height:38px;font-size:15px;}
 .avatar-md{width:48px;height:48px;font-size:18px;}
-.avatar-lg{width:96px;height:96px;font-size:32px;border:4px solid #fff;box-shadow:var(--shadow-md);}
-.avatar-xl{width:128px;height:128px;font-size:40px;border:5px solid #fff;box-shadow:var(--shadow-md);}
+.avatar-lg{width:96px;height:96px;font-size:32px;border:4px solid var(--surface);box-shadow:var(--shadow-md);}
+.avatar-xl{width:128px;height:128px;font-size:40px;border:5px solid var(--surface);box-shadow:var(--shadow-md);}
+
+/* ============ تجميعة أيقونات الهيدر (رسائل/إشعارات/بروفايل) + زر القائمة للموبايل ============ */
+.header-actions-desktop{display:flex;align-items:center;gap:8px;}
+.menu-toggle-btn{display:none;}
+@media (max-width:680px){
+  .header-actions-desktop{display:none;}
+  .menu-toggle-btn{display:flex;}
+}
+
+/* ============ القائمة الجانبية (Drawer) ============ */
+.drawer-overlay{
+  position:fixed;inset:0;background:rgba(26,27,58,.45);z-index:1200;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;
+}
+.drawer-overlay.open{opacity:1;pointer-events:auto;}
+.side-drawer{
+  position:fixed;top:0;bottom:0;right:0;width:82%;max-width:320px;background:var(--surface);
+  z-index:1201;box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .28s ease;
+  display:flex;flex-direction:column;overflow-y:auto;
+}
+.side-drawer.open{transform:translateX(0);}
+.drawer-head{display:flex;align-items:center;justify-content:flex-end;padding:14px 14px 0;}
+.drawer-close-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--bg);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;}
+.drawer-profile{display:flex;align-items:center;gap:12px;padding:6px 18px 16px;border-bottom:1px solid var(--border-soft);}
+.drawer-profile-name{font-weight:800;font-size:15.5px;}
+.drawer-profile-sub{font-size:12px;color:var(--muted);margin-top:2px;}
+.drawer-nav{padding:10px;flex:1;}
+.drawer-nav-item{
+  display:flex;align-items:center;gap:14px;padding:13px 10px;border-radius:12px;font-weight:700;
+  font-size:14.5px;color:var(--ink);position:relative;width:100%;background:none;border:none;text-align:right;font-family:inherit;
+}
+.drawer-nav-item:hover{background:var(--bg);}
+.drawer-nav-icon{width:36px;height:36px;border-radius:10px;background:var(--primary-tint);color:var(--primary-dark);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+.drawer-nav-item .badge{position:static;margin-inline-start:auto;border:none;}
+.drawer-nav-item.danger{color:var(--accent);}
+.drawer-nav-item.danger .drawer-nav-icon{background:var(--accent-tint);color:var(--accent);}
+.drawer-divider{height:1px;background:var(--border-soft);margin:8px 6px;}
 
 /* ============ حاوية الصفحة ============ */
 .page-container{max-width:640px;margin:0 auto;padding:20px 14px 90px;}
@@ -228,6 +289,19 @@ body.auth-pending > *:not(.auth-gate){
 .official-suggest-title{font-weight:800;font-size:14px;display:flex;align-items:center;}
 .official-suggest-sub{font-size:12px;color:var(--muted);margin-top:2px;}
 
+/* ============ أشخاص تعرفهم (اقتراحات صداقة) ============ */
+.people-you-may-know{padding:16px 0 6px;margin-bottom:16px;}
+.pymk-head{display:flex;align-items:center;justify-content:space-between;padding:0 16px 12px;}
+.pymk-title{font-weight:800;font-size:15px;}
+.pymk-see-all{font-size:12.5px;font-weight:700;color:var(--primary);}
+.pymk-scroll{display:flex;gap:12px;overflow-x:auto;padding:0 16px 4px;scrollbar-width:none;}
+.pymk-scroll::-webkit-scrollbar{display:none;}
+.pymk-item{flex:0 0 auto;width:132px;border:1px solid var(--border-soft);border-radius:var(--radius-md);padding:12px 10px;text-align:center;background:var(--surface-2);}
+.pymk-item .avatar{margin:0 auto 8px;}
+.pymk-name{font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pymk-meta{font-size:11px;color:var(--muted);margin-top:3px;min-height:14px;}
+.pymk-add-btn{width:100%;margin-top:9px;padding:8px;font-size:12.5px;}
+
 /* ============ قائمة المحادثات ============ */
 .chat-item{
   display:flex;align-items:center;gap:13px;padding:13px 8px;border-radius:12px;position:relative;
@@ -257,7 +331,7 @@ body.auth-pending > *:not(.auth-gate){
 .msg-row.theirs .msg-bubble{background:var(--surface-2);border:1px solid var(--border-soft);border-bottom-right-radius:5px;}
 .msg-time{font-size:10px;color:var(--muted);margin-top:4px;text-align:center;}
 .chat-input-bar{
-  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border-soft);
+  position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border-soft);
   padding:10px 14px;display:flex;gap:10px;align-items:center;
 }
 .chat-input-bar-inner{max-width:640px;margin:0 auto;display:flex;gap:10px;width:100%;}
@@ -265,7 +339,7 @@ body.auth-pending > *:not(.auth-gate){
   flex:1;border:1.5px solid var(--border);background:var(--surface-2);border-radius:var(--radius-pill);
   padding:12px 18px;font-size:14.5px;outline:none;
 }
-.chat-input-bar input:focus{border-color:var(--primary);background:#fff;}
+.chat-input-bar input:focus{border-color:var(--primary);background:var(--surface);}
 .chat-send-btn{
   width:44px;height:44px;border-radius:50%;background:var(--primary);color:#fff;border:none;
   display:flex;align-items:center;justify-content:center;flex:0 0 auto;
@@ -307,7 +381,7 @@ body.auth-pending > *:not(.auth-gate){
     display:none;align-items:flex-start;justify-content:center;padding:40px 14px;overflow-y:auto;
   }
   .modal-overlay.open{display:flex;}
-  .modal-box{background:#fff;border-radius:var(--radius-lg);width:100%;max-width:520px;box-shadow:var(--shadow-lg);}
+  .modal-box{background:var(--surface);border-radius:var(--radius-lg);width:100%;max-width:520px;box-shadow:var(--shadow-lg);}
   .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-soft);}
   .modal-head h3{margin:0;font-size:17px;}
   .modal-close{background:var(--bg);border:none;width:32px;height:32px;border-radius:50%;color:var(--ink-soft);font-size:16px;}
@@ -335,7 +409,11 @@ body.auth-pending > *:not(.auth-gate){
   .post-author-name{font-weight:800;font-size:14.5px;}
   .post-time{font-size:12px;color:var(--muted);}
   .post-menu-btn{background:none;border:none;color:var(--muted);font-size:20px;padding:6px 10px;}
-  .post-text{margin:12px 0;font-size:15px;line-height:1.7;white-space:pre-wrap;}
+  .post-text{margin:12px 0;font-size:15px;line-height:1.7;white-space:pre-wrap;border-radius:8px;transition:background-color .35s ease;}
+.post-text.copy-flash{background-color:var(--primary-tint);}
+.post-text-content{white-space:pre-wrap;}
+.post-more-btn{background:none;border:none;color:var(--primary);font-weight:800;font-size:13.5px;padding:2px 0;margin-inline-start:4px;cursor:pointer;font-family:inherit;}
+.post-more-btn:hover{text-decoration:underline;}
   .post-image{border-radius:var(--radius-md);overflow:hidden;margin-bottom:10px;max-height:460px;}
   .post-image img{width:100%;object-fit:cover;}
   .post-stats{display:flex;justify-content:space-between;padding:8px 2px;font-size:12.5px;color:var(--muted);}
@@ -344,11 +422,20 @@ body.auth-pending > *:not(.auth-gate){
     flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
     background:none;border:none;padding:10px 4px;border-radius:8px;color:var(--ink-soft);
     font-weight:700;font-size:13px;transition:background .15s,color .15s;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;
   }
   .post-action:hover{background:var(--bg);}
+  .post-action:disabled{opacity:.7;}
   .post-action.liked{color:var(--accent);}
   .post-action.saved{color:var(--success);}
-  .post-action svg{width:19px;height:19px;}
+  .post-action svg{width:20px;height:20px;transition:transform .18s ease;}
+  .post-action.like-btn.pop svg{animation:likePop .38s ease;}
+  @keyframes likePop{
+    0%{transform:scale(1);}
+    35%{transform:scale(1.35);}
+    60%{transform:scale(.92);}
+    100%{transform:scale(1);}
+  }
 
   .empty-feed{text-align:center;padding:60px 20px;color:var(--muted);}
   .empty-feed svg{margin-bottom:14px;opacity:.5;}
@@ -362,38 +449,97 @@ body.auth-pending > *:not(.auth-gate){
   <div class="app-header-inner">
     <a href="home.html" class="brand">
       <span class="brand-mark">
-        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.9"/>
-          <circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.85"/>
-        </svg>
+        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="19" r="10" fill="#5B4FE8" opacity="0.92"/><circle cx="24" cy="19" r="10" fill="#FF6B5B" opacity="0.88"/></svg>
       </span>
     </a>
 
     <a href="search.html" class="header-search">
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.8"/><path d="M21 21l-4.2-4.2"/></g></svg>
       <span>ابحث في واصل...</span>
     </a>
 
     <div class="header-actions">
       <a href="search.html" class="icon-btn" title="بحث" id="mobileSearchBtn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.8"/><path d="M21 21l-4.2-4.2"/></g></svg>
       </a>
-      <a href="messages.html" class="icon-btn" title="الرسائل">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 6l9 6 9-6M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
-        <span class="badge" id="msgBadge" style="display:none;">0</span>
-      </a>
-      <a href="friend-requests.html" class="icon-btn" title="طلبات الصداقة">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.3" stroke="currentColor" stroke-width="1.8"/><path d="M2.5 19c1.2-3.6 3.7-5.3 6.5-5.3s5.3 1.7 6.5 5.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M16.5 4.5a3.3 3.3 0 0 1 0 6.4M19.5 19c-.7-2.1-1.9-3.6-3.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M14 8h5M16.5 5.5v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span class="badge" id="friendReqBadge" style="display:none;">0</span>
-      </a>
-      <a href="notifications.html" class="icon-btn" title="الإشعارات" id="notifBtn">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3a5 5 0 0 0-5 5v3.2c0 .5-.2 1-.5 1.4L5 15h14l-1.5-2.4a2 2 0 0 1-.5-1.4V8a5 5 0 0 0-5-5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9.5 18a2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span class="badge" id="notifBadge" style="display:none;">0</span>
-      </a>
-      <a href="profile.html" class="avatar avatar-sm" id="headerAvatar"></a>
+      <div class="header-actions-desktop">
+        <a href="messages.html" class="icon-btn" title="الرسائل">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5C7.03 3.5 3 6.83 3 10.94c0 2.06 1.02 3.92 2.68 5.26-.12.98-.5 2.01-1.18 3.01a.4.4 0 0 0 .43.61c1.6-.34 2.94-.9 3.94-1.6.97.24 2.01.36 3.13.36 4.97 0 9-3.33 9-7.44S16.97 3.5 12 3.5Z"/></g></svg>
+          <span class="badge" id="msgBadge" style="display:none;">0</span>
+        </a>
+        <a href="friend-requests.html" class="icon-btn" title="طلبات الصداقة">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.3" r="3.6"/><path d="M4.5 19.8c1.3-4 4.2-5.9 7.5-5.9s6.2 1.9 7.5 5.9"/></g></svg>
+          <span class="badge" id="friendReqBadge" style="display:none;">0</span>
+        </a>
+        <a href="notifications.html" class="icon-btn" title="الإشعارات" id="notifBtn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2a5 5 0 0 0-5 5v3.15c0 .55-.18 1.08-.52 1.52L5 15.3h14l-1.48-2.43a2.5 2.5 0 0 1-.52-1.52V8.2a5 5 0 0 0-5-5Z"/><path d="M9.6 18.3a2.4 2.4 0 0 0 4.8 0"/></g></svg>
+          <span class="badge" id="notifBadge" style="display:none;">0</span>
+        </a>
+        <a href="profile.html" class="avatar avatar-sm" id="headerAvatar"></a>
+      </div>
+      <button class="icon-btn menu-toggle-btn" title="القائمة" id="menuToggleBtn" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></g></svg>
+      </button>
     </div>
   </div>
 </header>
+
+<!-- ===================== القائمة الجانبية (موبايل) ===================== -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="side-drawer" id="sideDrawer">
+  <div class="drawer-head">
+    <button class="drawer-close-btn" id="drawerCloseBtn" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></g></svg></button>
+  </div>
+  <a href="profile.html" class="drawer-profile">
+    <div class="avatar avatar-md" id="drawerAvatar"></div>
+    <div>
+      <div class="drawer-profile-name" id="drawerName"></div>
+      <div class="drawer-profile-sub">عرض صفحتك الشخصية</div>
+    </div>
+  </a>
+  <nav class="drawer-nav">
+    <a href="messages.html" class="drawer-nav-item">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5C7.03 3.5 3 6.83 3 10.94c0 2.06 1.02 3.92 2.68 5.26-.12.98-.5 2.01-1.18 3.01a.4.4 0 0 0 .43.61c1.6-.34 2.94-.9 3.94-1.6.97.24 2.01.36 3.13.36 4.97 0 9-3.33 9-7.44S16.97 3.5 12 3.5Z"/></g></svg>
+      </span>
+      الرسائل
+      <span class="badge" id="msgBadgeDrawer" style="display:none;">0</span>
+    </a>
+    <a href="notifications.html" class="drawer-nav-item">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2a5 5 0 0 0-5 5v3.15c0 .55-.18 1.08-.52 1.52L5 15.3h14l-1.48-2.43a2.5 2.5 0 0 1-.52-1.52V8.2a5 5 0 0 0-5-5Z"/><path d="M9.6 18.3a2.4 2.4 0 0 0 4.8 0"/></g></svg>
+      </span>
+      الإشعارات
+      <span class="badge" id="notifBadgeDrawer" style="display:none;">0</span>
+    </a>
+    <a href="friend-requests.html" class="drawer-nav-item">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.3" r="3.6"/><path d="M4.5 19.8c1.3-4 4.2-5.9 7.5-5.9s6.2 1.9 7.5 5.9"/></g></svg>
+      </span>
+      طلبات الصداقة
+      <span class="badge" id="friendReqBadgeDrawer" style="display:none;">0</span>
+    </a>
+    <a href="profile.html" class="drawer-nav-item">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.3" r="3.6"/><path d="M4.5 19.8c1.3-4 4.2-5.9 7.5-5.9s6.2 1.9 7.5 5.9"/></g></svg>
+      </span>
+      البروفايل
+    </a>
+    <a href="profile.html?tab=settings" class="drawer-nav-item">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></g></svg>
+      </span>
+      الإعدادات
+    </a>
+    <div class="drawer-divider"></div>
+    <button class="drawer-nav-item danger" id="drawerLogoutBtn" type="button">
+      <span class="drawer-nav-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h3.7a1.8 1.8 0 0 1 1.8 1.8v12.4a1.8 1.8 0 0 1-1.8 1.8h-3.7"/><path d="M10 8l-4.5 4 4.5 4"/><path d="M15 12H5.5"/></g></svg>
+      </span>
+      تسجيل الخروج
+    </button>
+  </nav>
+</aside>
 
 <!-- ===================== الصفحة الرئيسية ===================== -->
 <main class="page-container">
@@ -401,16 +547,16 @@ body.auth-pending > *:not(.auth-gate){
   <!-- صندوق إنشاء منشور -->
   <div class="card composer">
     <div class="composer-top">
-      <div class="avatar avatar-md" id="composerAvatar"></div>
+      <a href="profile.html" class="avatar avatar-md" id="composerAvatar" title="صفحتك الشخصية"></a>
       <div class="composer-input" id="openComposer">بم تفكّر؟</div>
     </div>
     <div class="composer-actions">
       <button class="composer-action-btn" id="openComposerText">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 20h4L18.5 9.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 15v5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 20.5h9"/><path d="M15.6 4.4a2.1 2.1 0 0 1 3 3L8.2 17.8l-4.1 1 1-4.1Z"/></g></svg>
         كتابة منشور
       </button>
       <button class="composer-action-btn" id="openComposerPhoto">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M21 16l-5.5-5.5L7 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.2a1 1 0 0 1 1-1h2l1.1-1.7a1 1 0 0 1 .85-.5h5.1a1 1 0 0 1 .84.5l1.1 1.7h2a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1Z"/><circle cx="12" cy="13.1" r="3.1"/></g></svg>
         إضافة صورة
       </button>
     </div>
@@ -426,6 +572,15 @@ body.auth-pending > *:not(.auth-gate){
     <button class="btn btn-primary" id="officialSuggestBtn" style="padding:9px 16px;font-size:13px;">متابعة</button>
   </a>
 
+  <!-- أشخاص تعرفهم (اقتراحات صداقة) -->
+  <div class="card people-you-may-know" id="pymkCard" style="display:none;">
+    <div class="pymk-head">
+      <div class="pymk-title">أشخاص تعرفهم</div>
+      <a href="friend-requests.html?tab=suggestions" class="pymk-see-all">عرض الكل</a>
+    </div>
+    <div class="pymk-scroll" id="pymkScroll"></div>
+  </div>
+
   <!-- المنشورات -->
   <div id="feed">
     <div class="card post skeleton" style="height:180px;"></div>
@@ -433,7 +588,7 @@ body.auth-pending > *:not(.auth-gate){
   </div>
 
   <div class="empty-feed" id="emptyFeed" style="display:none;">
-    <svg width="60" height="60" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    <svg width="60" height="60" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M4 12h16M4 17.5h16"/></g></svg>
     <p>لسه مفيش منشورات — كن أول من يشارك!</p>
   </div>
 </main>
@@ -459,7 +614,7 @@ body.auth-pending > *:not(.auth-gate){
     <div class="modal-footer">
       <div>
         <label class="attach-photo-btn" id="attachPhotoLabel">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8.5" cy="10" r="1.5" fill="currentColor"/><path d="M21 16l-5.5-5.5L7 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 8.2a1 1 0 0 1 1-1h2l1.1-1.7a1 1 0 0 1 .85-.5h5.1a1 1 0 0 1 .84.5l1.1 1.7h2a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1Z"/><circle cx="12" cy="13.1" r="3.1"/></g></svg>
           إضافة صورة
         </label>
         <input type="file" id="postImageInput" accept="image/*" style="display:none;">
@@ -800,7 +955,7 @@ function logout(){
 
 /* ---------- شارة التوثيق (تظهر جنب اسم أي حساب موثّق زي حساب واصل الرسمي) ---------- */
 function verifiedBadgeHTML(){
-  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2l2.4 1.7 2.9-.4 1.2 2.6 2.6 1.2-.4 2.9L22.4 12l-1.7 2.4.4 2.9-2.6 1.2-1.2 2.6-2.9-.4L12 22l-2.4-1.7-2.9.4-1.2-2.6-2.6-1.2.4-2.9L1.6 12l1.7-2.4-.4-2.9 2.6-1.2 1.2-2.6 2.9.4L12 2Z" fill="#5B4FE8"/><path d="M8.5 12.3l2.3 2.3 4.7-5" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  return `<svg class="verified-badge" width="15" height="15" viewBox="0 0 24 24" fill="none" title="حساب موثّق"><path d="M12 2.2l2.1 1.4 2.5-.6 1.3 2.2 2.3 1.1-.3 2.5 1.6 2-1.6 2 .3 2.5-2.3 1.1-1.3 2.2-2.5-.6L12 21.8l-2.1-1.4-2.5.6-1.3-2.2-2.3-1.1.3-2.5-1.6-2 1.6-2-.3-2.5 2.3-1.1 1.3-2.2 2.5.6Z" fill="#5B4FE8" stroke="none"/><path d="M8.3 12.2l2.4 2.4 5-5.4" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
 }
 function nameWithBadge(name, isVerified){
   return `<span class="name-with-badge">${escapeHTML(name || '')}${isVerified ? verifiedBadgeHTML() : ''}</span>`;
@@ -811,6 +966,21 @@ function escapeHTML(str){
   const div = document.createElement('div');
   div.textContent = str || '';
   return div.innerHTML;
+}
+
+/* ---------- تطبيع النص العربي (مستخدمة في مقارنة المدينة لاقتراحات الصداقة) ---------- */
+function normalizeArabic(str){
+  return (str || '')
+    .replace(/[\u064B-\u065F\u0670\u06D6-\u06ED]/g, '')
+    .replace(/\u0640/g, '')
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي');
+}
+function normalizeForSearch(str){
+  return normalizeArabic((str || '').trim().toLowerCase());
 }
 
 </script>
@@ -950,10 +1120,9 @@ const WaselSocial = (function(){
   }
 
   /* ---------------- شارات الهيدر (عدد الطلبات / الرسائل غير المقروءة) ---------------- */
-  function listenFriendRequestsBadge(uid, badgeEl){
-    if(!badgeEl) return;
-    db.ref('friendRequests/' + uid).on('value', (snap) => {
-      const count = snap.exists() ? snap.numChildren() : 0;
+  function setBadges(badgeEls, count){
+    const els = (Array.isArray(badgeEls) ? badgeEls : [badgeEls]).filter(Boolean);
+    els.forEach(badgeEl => {
       if(count > 0){
         badgeEl.style.display = 'flex';
         badgeEl.textContent = count > 9 ? '9+' : count;
@@ -963,17 +1132,19 @@ const WaselSocial = (function(){
     });
   }
 
-  function listenUnreadChatsBadge(uid, badgeEl){
-    if(!badgeEl) return;
+  function listenFriendRequestsBadge(uid, badgeEls){
+    if(!badgeEls) return;
+    db.ref('friendRequests/' + uid).on('value', (snap) => {
+      setBadges(badgeEls, snap.exists() ? snap.numChildren() : 0);
+    });
+  }
+
+  function listenUnreadChatsBadge(uid, badgeEls){
+    if(!badgeEls) return;
     db.ref('userChats/' + uid).on('value', (snap) => {
       let count = 0;
       if(snap.exists()) snap.forEach(c => { if(c.val().unread) count++; });
-      if(count > 0){
-        badgeEl.style.display = 'flex';
-        badgeEl.textContent = count > 9 ? '9+' : count;
-      }else{
-        badgeEl.style.display = 'none';
-      }
+      setBadges(badgeEls, count);
     });
   }
 
@@ -1022,13 +1193,30 @@ requireAuth((user, userData) => {
   avatarHTML(document.getElementById('headerAvatar'), currentUserData);
   avatarHTML(document.getElementById('composerAvatar'), currentUserData);
   avatarHTML(document.getElementById('modalAvatar'), currentUserData);
+  avatarHTML(document.getElementById('drawerAvatar'), currentUserData);
   document.getElementById('modalName').textContent = [currentUserData.firstName, currentUserData.lastName].filter(Boolean).join(' ');
+  document.getElementById('drawerName').textContent = [currentUserData.firstName, currentUserData.lastName].filter(Boolean).join(' ');
   listenNotifications();
   listenFeed();
-  WaselSocial.listenFriendRequestsBadge(currentUser.uid, document.getElementById('friendReqBadge'));
-  WaselSocial.listenUnreadChatsBadge(currentUser.uid, document.getElementById('msgBadge'));
+  WaselSocial.listenFriendRequestsBadge(currentUser.uid, [document.getElementById('friendReqBadge'), document.getElementById('friendReqBadgeDrawer')]);
+  WaselSocial.listenUnreadChatsBadge(currentUser.uid, [document.getElementById('msgBadge'), document.getElementById('msgBadgeDrawer')]);
   loadOfficialSuggestion();
+  loadPeopleYouMayKnow();
 });
+
+/* ---------------- القائمة الجانبية (Drawer) ---------------- */
+(function initDrawer(){
+  const overlay = document.getElementById('drawerOverlay');
+  const drawer = document.getElementById('sideDrawer');
+  const openBtn = document.getElementById('menuToggleBtn');
+  const closeBtn = document.getElementById('drawerCloseBtn');
+  function openDrawer(){ overlay.classList.add('open'); drawer.classList.add('open'); }
+  function closeDrawer(){ overlay.classList.remove('open'); drawer.classList.remove('open'); }
+  openBtn.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+  document.getElementById('drawerLogoutBtn').addEventListener('click', () => { closeDrawer(); logout(); });
+})();
 
 /* ---------------- اقتراح متابعة الحساب الرسمي ---------------- */
 async function loadOfficialSuggestion(){
@@ -1062,6 +1250,117 @@ async function loadOfficialSuggestion(){
       showToast('تعذرت المتابعة', 'error');
     }
   });
+}
+
+/* ---------------- أشخاص تعرفهم (نفس منطق اقتراحات الصداقة في صفحة طلبات الصداقة) ----------------
+   بيرتب المقترحين بالأصدقاء المشتركين من الأعلى للأقل، وبعدين بنفس
+   المحافظة/المدينة/الدولة — وبيعرض أول 8 بس هنا مع رابط "عرض الكل". */
+async function computeFriendSuggestions(me, meData){
+  const [friendsSnap, usersSnap, receivedSnap, sentSnap] = await Promise.all([
+    db.ref('friends/' + me.uid).get(),
+    db.ref('users').get(),
+    db.ref('friendRequests/' + me.uid).get(),
+    db.ref('sentFriendRequests/' + me.uid).get()
+  ]);
+
+  const myFriends = friendsSnap.exists() ? Object.keys(friendsSnap.val()) : [];
+  const myFriendsSet = new Set(myFriends);
+  const receivedSet = receivedSnap.exists() ? new Set(Object.keys(receivedSnap.val())) : new Set();
+  const sentSet = sentSnap.exists() ? new Set(Object.keys(sentSnap.val())) : new Set();
+
+  const allUsers = {};
+  if(usersSnap.exists()) usersSnap.forEach(c => { allUsers[c.key] = c.val(); });
+
+  const mutualCountMap = {};
+  const friendsOfFriendsSnaps = await Promise.all(myFriends.map(fid => db.ref('friends/' + fid).get()));
+  friendsOfFriendsSnaps.forEach(snap => {
+    if(!snap.exists()) return;
+    Object.keys(snap.val()).forEach(uid => {
+      if(uid === me.uid) return;
+      mutualCountMap[uid] = (mutualCountMap[uid] || 0) + 1;
+    });
+  });
+
+  const candidateIds = new Set(Object.keys(mutualCountMap));
+  const haveLocation = !!(meData.city || meData.governorate || meData.country);
+  if(haveLocation){
+    Object.keys(allUsers).forEach(uid => {
+      const u = allUsers[uid];
+      const sameCity = meData.city && u.city && normalizeForSearch(u.city) === normalizeForSearch(meData.city);
+      const sameGov = meData.governorate && u.governorate && u.governorate === meData.governorate;
+      const sameCountry = meData.country && u.country && u.country === meData.country;
+      if(sameCity || sameGov || sameCountry) candidateIds.add(uid);
+    });
+  }
+
+  const results = [];
+  candidateIds.forEach(uid => {
+    if(uid === me.uid) return;
+    if(myFriendsSet.has(uid)) return;
+    if(receivedSet.has(uid) || sentSet.has(uid)) return;
+    const u = allUsers[uid];
+    if(!u || u.blocked) return;
+
+    const mutualCount = mutualCountMap[uid] || 0;
+    let locationLabel = '';
+    let locationScore = 0;
+    if(meData.city && u.city && normalizeForSearch(u.city) === normalizeForSearch(meData.city)){
+      locationLabel = `من ${u.city}`; locationScore = 3;
+    }else if(meData.governorate && u.governorate === meData.governorate){
+      locationLabel = `من محافظة ${u.governorate}`; locationScore = 2;
+    }else if(meData.country && u.country === meData.country){
+      locationLabel = `من ${u.country}`; locationScore = 1;
+    }
+
+    if(mutualCount === 0 && locationScore === 0) return;
+    results.push({ id: uid, data: u, mutualCount, locationScore, locationLabel });
+  });
+
+  results.sort((a, b) => b.mutualCount - a.mutualCount || b.locationScore - a.locationScore);
+  return results;
+}
+
+async function loadPeopleYouMayKnow(){
+  try{
+    const results = (await computeFriendSuggestions(currentUser, currentUserData || {})).slice(0, 8);
+    if(results.length === 0) return;
+
+    const card = document.getElementById('pymkCard');
+    const scroll = document.getElementById('pymkScroll');
+    scroll.innerHTML = results.map(r => {
+      const u = r.data;
+      const fullName = [u.firstName, u.lastName].filter(Boolean).join(' ');
+      const meta = r.mutualCount > 0 ? `${r.mutualCount} صديق مشترك` : (r.locationLabel || '');
+      return `
+        <div class="pymk-item" data-uid="${r.id}">
+          <a href="profile.html?uid=${r.id}" class="avatar avatar-lg" style="width:64px;height:64px;font-size:22px;" id="pymkAvatar-${r.id}"></a>
+          <a href="profile.html?uid=${r.id}" class="pymk-name">${nameWithBadge(fullName, u.verified)}</a>
+          <div class="pymk-meta">${escapeHTML(meta)}</div>
+          <button class="btn btn-primary pymk-add-btn" data-uid="${r.id}">إضافة صديق</button>
+        </div>`;
+    }).join('');
+
+    results.forEach(r => avatarHTML(document.getElementById('pymkAvatar-' + r.id), r.data));
+
+    scroll.querySelectorAll('.pymk-add-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        btn.textContent = 'تم الإرسال';
+        try{
+          await WaselSocial.sendFriendRequest(currentUser, currentUserData, btn.dataset.uid);
+          showToast('تم إرسال طلب الصداقة', 'success');
+        }catch(err){
+          showToast('حصلت مشكلة، جرب تاني', 'error');
+          btn.disabled = false;
+          btn.textContent = 'إضافة صديق';
+        }
+      });
+    });
+
+    card.style.display = 'block';
+  }catch(err){
+    console.error('خطأ في تحميل اقتراحات الصداقة:', err);
+  }
 }
 
 /* ---------------- فتح/قفل نافذة كتابة المنشور ---------------- */
@@ -1195,7 +1494,7 @@ function renderPost(p, savedMap){
       <button class="post-menu-btn">⋯</button>
     </div>
 
-    ${p.text ? `<div class="post-text">${escapeHTML(p.text)}</div>` : ''}
+    ${renderPostText(p.text)}
     ${p.imageBase64 ? `<div class="post-image"><img src="${p.imageBase64}" loading="lazy"></div>` : ''}
 
     <div class="post-stats">
@@ -1205,19 +1504,19 @@ function renderPost(p, savedMap){
 
     <div class="post-actions">
       <button class="post-action like-btn ${liked ? 'liked' : ''}" data-id="${p.id}">
-        <svg viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}"><path d="M12 21s-7.5-4.6-10-9.3C.5 8 2.3 4.5 6 4.5c2 0 3.4 1 6 3.6 2.6-2.6 4-3.6 6-3.6 3.7 0 5.5 3.5 4 7.2C19.5 16.4 12 21 12 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}"><path d="M12 20.3c-.28 0-.55-.1-.76-.28C6.98 16.9 3 13.4 3 9.6 3 6.6 5.4 4.2 8.4 4.2c1.7 0 3.3.78 4.35 2.05.02.02.02.02.05 0C13.85 5 15.45 4.2 17.1 4.2c3 0 5.4 2.4 5.4 5.4 0 3.8-3.98 7.3-8.24 10.42-.2.18-.48.28-.76.28Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"/></svg>
         إعجاب
       </button>
       <button class="post-action comment-btn" data-id="${p.id}">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H8l-4 4V4Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5C7.03 3.5 3 6.83 3 10.94c0 2.06 1.02 3.92 2.68 5.26-.12.98-.5 2.01-1.18 3.01a.4.4 0 0 0 .43.61c1.6-.34 2.94-.9 3.94-1.6.97.24 2.01.36 3.13.36 4.97 0 9-3.33 9-7.44S16.97 3.5 12 3.5Z"/></g></svg>
         تعليق
       </button>
       <button class="post-action share-btn" data-id="${p.id}">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v14" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="none"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3.3 11.9 20.5 3.6a.9.9 0 0 1 1.2 1.2L14 22a.9.9 0 0 1-1.65.08l-3.3-6.6-6.6-3.3a.9.9 0 0 1 .15-1.28.9.9 0 0 1 .3-.24Z"/><path d="M10.7 13.4 15.5 8.6"/></g></svg>
         مشاركة
       </button>
       <button class="post-action save-btn ${saved ? 'saved' : ''}" data-id="${p.id}">
-        <svg viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24" fill="${saved ? 'currentColor' : 'none'}"><path d="M7.2 3.7h9.6a1.3 1.3 0 0 1 1.3 1.3v15.4l-6.1-3.9-6.1 3.9V5a1.3 1.3 0 0 1 1.3-1.3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
         حفظ
       </button>
     </div>
@@ -1232,10 +1531,88 @@ function escapeHTML(str){
   return div.innerHTML;
 }
 
+/* ---------------- نص المنشور: تقصير + عرض المزيد ---------------- */
+const POST_TEXT_LIMIT = 260;
+function renderPostText(text){
+  if(!text) return '';
+  const fullSafe = escapeHTML(text);
+  if(text.length <= POST_TEXT_LIMIT){
+    return `<div class="post-text" data-full="${encodeURIComponent(text)}"><span class="post-text-content">${fullSafe}</span></div>`;
+  }
+  let cut = text.slice(0, POST_TEXT_LIMIT);
+  const lastSpace = cut.lastIndexOf(' ');
+  if(lastSpace > POST_TEXT_LIMIT * 0.6) cut = cut.slice(0, lastSpace);
+  const shortSafe = escapeHTML(cut) + '…';
+  return `<div class="post-text is-truncated" data-full="${encodeURIComponent(text)}" data-short="${encodeURIComponent(shortSafe)}">
+    <span class="post-text-content">${shortSafe}</span>
+    <button class="post-more-btn" type="button">عرض المزيد</button>
+  </div>`;
+}
+
+function togglePostText(btn){
+  const wrap = btn.closest('.post-text');
+  wrap.classList.toggle('is-truncated');
+  const truncated = wrap.classList.contains('is-truncated');
+  const content = wrap.querySelector('.post-text-content');
+  content.innerHTML = truncated ? decodeURIComponent(wrap.dataset.short) : escapeHTML(decodeURIComponent(wrap.dataset.full));
+  btn.textContent = truncated ? 'عرض المزيد' : 'عرض أقل';
+}
+
+async function copyPostText(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast('تم نسخ النص', 'success');
+  }catch(e){
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      showToast('تم نسخ النص', 'success');
+    }catch(e2){
+      showToast('تعذر نسخ النص', 'error');
+    }
+  }
+}
+
+/* ---------------- نسخ النص بالضغط المطوّل ---------------- */
+function attachLongPressCopy(root){
+  (root || document).querySelectorAll('.post-text').forEach(el => {
+    if(el.dataset.lpBound) return;
+    el.dataset.lpBound = '1';
+    let timer = null, longPressed = false;
+    const start = () => {
+      longPressed = false;
+      timer = setTimeout(() => {
+        longPressed = true;
+        copyPostText(decodeURIComponent(el.dataset.full || ''));
+        el.classList.add('copy-flash');
+        setTimeout(() => el.classList.remove('copy-flash'), 400);
+      }, 550);
+    };
+    const cancel = () => { clearTimeout(timer); };
+    el.addEventListener('touchstart', start, { passive: true });
+    el.addEventListener('touchend', cancel);
+    el.addEventListener('touchmove', cancel);
+    el.addEventListener('touchcancel', cancel);
+    el.addEventListener('mousedown', start);
+    el.addEventListener('mouseup', cancel);
+    el.addEventListener('mouseleave', cancel);
+    el.addEventListener('click', (e) => {
+      if(longPressed){ e.preventDefault(); e.stopPropagation(); }
+    });
+  });
+}
+
 /* ---------------- ربط أزرار كل منشور ---------------- */
 function attachPostListeners(){
   document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', () => toggleLike(btn.dataset.id, btn));
+    btn.addEventListener('click', () => {
+      btn.classList.add('pop');
+      setTimeout(() => btn.classList.remove('pop'), 400);
+      toggleLike(btn.dataset.id, btn);
+    });
   });
   document.querySelectorAll('.save-btn').forEach(btn => {
     btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
@@ -1246,27 +1623,41 @@ function attachPostListeners(){
   document.querySelectorAll('.comment-btn').forEach(btn => {
     btn.addEventListener('click', () => toggleComments(btn.dataset.id));
   });
+  document.querySelectorAll('.post-more-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => { e.stopPropagation(); togglePostText(btn); });
+  });
+  attachLongPressCopy(document);
 }
 
+const likeInFlight = new Set();
 async function toggleLike(postId, btn){
-  const ref = db.ref(`posts/${postId}/likes/${currentUser.uid}`);
-  const countRef = db.ref(`posts/${postId}/likesCount`);
-  const snap = await ref.get();
-  if(snap.exists()){
-    await ref.remove();
-    countRef.transaction(v => Math.max(0, (v || 1) - 1));
-  }else{
-    await ref.set(true);
-    countRef.transaction(v => (v || 0) + 1);
-    const postSnap = await db.ref(`posts/${postId}`).get();
-    const post = postSnap.val();
-    if(post && post.uid !== currentUser.uid){
-      db.ref(`notifications/${post.uid}`).push({
-        type: 'like', fromUid: currentUser.uid,
-        fromName: [currentUserData.firstName, currentUserData.lastName].filter(Boolean).join(' '),
-        postId, read: false, createdAt: Date.now()
-      });
+  if(likeInFlight.has(postId)) return; // منع الضغط المزدوج/السريع من التسبب في تبديل الحالة مرتين
+  likeInFlight.add(postId);
+  if(btn) btn.disabled = true;
+  try{
+    const ref = db.ref(`posts/${postId}/likes/${currentUser.uid}`);
+    const countRef = db.ref(`posts/${postId}/likesCount`);
+    // قراءة الحالة الحالية ثم الكتابة (transaction على مسار likes مرفوض من قواعد الأمان)
+    const snap = await ref.get();
+    if(snap.exists()){
+      await ref.remove();
+      countRef.transaction(v => Math.max(0, (v || 1) - 1));
+    }else{
+      await ref.set(true);
+      countRef.transaction(v => (v || 0) + 1);
+      const postSnap = await db.ref(`posts/${postId}`).get();
+      const post = postSnap.val();
+      if(post && post.uid !== currentUser.uid){
+        db.ref(`notifications/${post.uid}`).push({
+          type: 'like', fromUid: currentUser.uid,
+          fromName: [currentUserData.firstName, currentUserData.lastName].filter(Boolean).join(' '),
+          postId, read: false, createdAt: Date.now()
+        });
+      }
     }
+  } finally {
+    likeInFlight.delete(postId);
+    if(btn) btn.disabled = false;
   }
 }
 
@@ -1348,13 +1739,15 @@ async function submitComment(postId){
 function listenNotifications(){
   db.ref('notifications/' + currentUser.uid).orderByChild('read').equalTo(false).on('value', (snap) => {
     const count = snap.numChildren();
-    const badge = document.getElementById('notifBadge');
-    if(count > 0){
-      badge.style.display = 'flex';
-      badge.textContent = count > 9 ? '9+' : count;
-    }else{
-      badge.style.display = 'none';
-    }
+    [document.getElementById('notifBadge'), document.getElementById('notifBadgeDrawer')].forEach(badge => {
+      if(!badge) return;
+      if(count > 0){
+        badge.style.display = 'flex';
+        badge.textContent = count > 9 ? '9+' : count;
+      }else{
+        badge.style.display = 'none';
+      }
+    });
   });
 }
 
